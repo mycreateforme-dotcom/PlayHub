@@ -14,151 +14,161 @@
       --text-muted: #8b949e;
       --border: #30363d;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { display: flex; height: 100vh; background: var(--bg); color: var(--text); overflow: hidden; }
 
-    /* Sidebar */
-    #sidebar { width: 320px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
-    #sidebar h2 { font-size: 1.25rem; margin-bottom: 1rem; }
+    #sidebar { width: 300px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 0.85rem; margin-bottom: 4px; color: var(--text-muted); }
     .form-group input, .form-group select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: #fff; }
-    button { width: 100%; padding: 8px 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--primary); color: #fff; transition: opacity 0.2s; }
-    button:hover { opacity: 0.9; }
+    button { width: 100%; padding: 8px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--primary); color: #fff; }
     button.secondary { background: var(--card-bg); border: 1px solid var(--border); margin-top: 8px; }
+    button.save-btn { background: #238636; margin-top: 4px; }
     button.danger { background: #d73a49; }
 
-    /* Main Area */
     #main { flex: 1; padding: 24px; overflow-y: auto; }
     .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 20px; }
-    .metric { text-align: right; }
     .metric-value { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
 
-    /* Player Container */
     #player-section { margin-bottom: 24px; background: var(--card-bg); border-radius: 8px; padding: 16px; border: 1px solid var(--border); display: none; }
     .player-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .player-actions { display: flex; gap: 8px; }
     .player-actions button { width: auto; }
     iframe { width: 100%; height: 600px; border: none; border-radius: 6px; background: #000; }
 
-    /* Grid */
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
-    .card .icon { font-size: 2.5rem; margin-bottom: 8px; }
-    .card .title { font-size: 1rem; margin-bottom: 4px; }
-    .card .plays { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
-    .admin-controls { margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 10px; display: none; }
+    .icon { font-size: 2.5rem; }
+    .title { font-size: 1rem; margin: 6px 0; }
+    .plays { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
+    .admin-actions { display: none; margin-top: 8px; border-top: 1px dashed var(--border); padding-top: 8px; text-align: left; }
+    .admin-actions label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 2px; }
+    .admin-actions input { width: 100%; padding: 4px 6px; margin-bottom: 4px; background: var(--bg); color: #fff; border: 1px solid var(--border); border-radius: 4px; }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
   <aside id="sidebar">
-    <h2>🎮 PlayHub Admin</h2>
-    <div id="login-panel">
-      <div class="form-group"><label>Username</label><input type="text" id="username" /></div>
-      <div class="form-group"><label>Password</label><input type="password" id="password" /></div>
+    <h2 style="margin-bottom: 16px;">🎮 PlayHub Admin</h2>
+    <div id="login-box">
+      <div class="form-group"><label>Username</label><input type="text" id="user" /></div>
+      <div class="form-group"><label>Password</label><input type="password" id="pass" /></div>
       <button onclick="login()">Log In</button>
     </div>
 
-    <div id="admin-panel" style="display: none;">
-      <p style="color: #4ade80; margin-bottom: 12px;">🟢 Logged in as: <strong>Keshav</strong></p>
+    <div id="admin-box" style="display: none;">
+      <p style="color: #4ade80; margin-bottom: 8px;">🟢 Admin: Keshav</p>
       <button class="secondary" onclick="logout()">Log Out</button>
       <hr style="border-color: var(--border); margin: 16px 0;" />
-      <h3 style="font-size: 1rem; margin-bottom: 10px;">➕ Add New Game</h3>
-      <div class="form-group"><label>Title</label><input type="text" id="new-title" /></div>
-      <div class="form-group"><label>URL</label><input type="text" id="new-url" placeholder="https://..." /></div>
+      <h4 style="margin-bottom: 10px;">➕ Add New Game</h4>
+      <div class="form-group"><label>Title</label><input type="text" id="g-title" /></div>
+      <div class="form-group"><label>URL</label><input type="text" id="g-url" placeholder="https://..." /></div>
       <div class="form-group">
         <label>Icon</label>
-        <select id="new-icon">
+        <select id="g-icon">
           <option>🎮</option><option>🚀</option><option>⚔️</option><option>🤖</option>
           <option>⚡</option><option>🏓</option><option>💥</option><option>🏄</option><option>🪐</option><option>♟️</option>
         </select>
       </div>
-      <div class="form-group"><label>Initial Plays</label><input type="number" id="new-plays" value="0" /></div>
+      <div class="form-group"><label>Initial Plays</label><input type="number" id="g-plays" value="0" min="0" /></div>
       <button onclick="addGame()">Publish Game</button>
       <button class="secondary" onclick="resetGames()">🔄 Reset to Defaults</button>
     </div>
   </aside>
 
-  <!-- Main Content -->
   <main id="main">
     <div class="header">
       <div>
         <h1>🎮 PlayHub</h1>
-        <p style="color: var(--text-muted);">Click any game below to play directly in your browser.</p>
+        <p style="color: var(--text-muted);">Click any game to play directly in your browser.</p>
       </div>
-      <div class="metric">
-        <div>Total Global Plays</div>
-        <div class="metric-value" id="total-plays">0</div>
+      <div style="text-align: right;">
+        <div>Total Plays</div>
+        <div class="metric-value" id="total-count">0</div>
       </div>
     </div>
 
-    <!-- Active Game Frame -->
     <section id="player-section">
       <div class="player-header">
-        <h3 id="player-title">Playing:</h3>
+        <h3 id="player-name">Playing</h3>
         <div class="player-actions">
-          <button class="secondary" id="open-tab-btn" onclick="openFullscreen()">⤢ Full Tab</button>
+          <button class="secondary" onclick="openTab()">⤢ Full Tab</button>
           <button class="danger" onclick="closePlayer()">✕ Close</button>
         </div>
       </div>
-      <iframe id="game-frame" src=""></iframe>
+      <!-- Added allow flags for camera, microphone, and gestures -->
+      <iframe id="game-frame" src="" allow="camera; microphone; fullscreen; autoplay; display-capture" allowfullscreen></iframe>
     </section>
 
-    <!-- Games Grid -->
-    <section class="grid" id="games-grid"></section>
+    <div class="grid" id="grid"></div>
   </main>
 
   <script>
-    const API = "http://127.0.0.1:8000/api";
-    let games = [];
-    let isAdmin = false;
-    let activeGameUrl = "";
+    const INITIAL_GAMES = [
+      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "icon": "♟️", "plays": 0},
+      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "icon": "🚀", "plays": 0},
+      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "icon": "⚔️", "plays": 0},
+      {"id": "game_stell_titans", "title": "Stell Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "icon": "🤖", "plays": 0},
+      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "icon": "🖐️", "plays": 0},
+      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "icon": "⚡", "plays": 0},
+      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "icon": "🏓", "plays": 0},
+      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "icon": "💥", "plays": 0},
+      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "icon": "🏄", "plays": 0},
+      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "icon": "🪐", "plays": 0}
+    ];
 
-    async function loadGames() {
-      const res = await fetch(`${API}/games`);
-      games = await res.json();
+    let games = JSON.parse(localStorage.getItem("playhub_games")) || INITIAL_GAMES;
+    let isAdmin = false;
+    let activeUrl = "";
+
+    function save() {
+      localStorage.setItem("playhub_games", JSON.stringify(games));
       render();
     }
 
     function render() {
-      // Metric
-      const total = games.reduce((acc, g) => acc + (g.plays || 0), 0);
-      document.getElementById("total-plays").innerText = total.toLocaleString();
+      const total = games.reduce((s, g) => s + (parseInt(g.plays) || 0), 0);
+      document.getElementById("total-count").innerText = total.toLocaleString();
 
-      // Grid
-      const grid = document.getElementById("games-grid");
-      grid.innerHTML = games.map(g => `
+      document.getElementById("grid").innerHTML = games.map(g => `
         <div class="card">
           <div>
-            <div class="icon">${g.icon || '🎮'}</div>
+            <div class="icon">${g.icon}</div>
             <div class="title">${g.title}</div>
-            <div class="plays">${(g.plays || 0).toLocaleString()} plays</div>
+            <div class="plays">${(parseInt(g.plays) || 0).toLocaleString()} plays</div>
           </div>
           <div>
-            <button onclick="launchGame('${g.id}')">▶ Play</button>
-            <div class="admin-controls" style="display: ${isAdmin ? 'block' : 'none'};">
-              <input type="number" value="${g.plays || 0}" id="plays-${g.id}" style="width: 70px; padding: 4px; margin-bottom: 4px; background: var(--bg); color:#fff; border: 1px solid var(--border); border-radius: 4px;" />
-              <button class="secondary" style="padding: 4px 8px; font-size: 0.75rem;" onclick="updatePlays('${g.id}')">Save</button>
-              <button class="danger" style="padding: 4px 8px; font-size: 0.75rem; margin-top: 4px;" onclick="deleteGame('${g.id}')">🗑️ Delete</button>
+            <button onclick="play('${g.id}')">▶ Play</button>
+            <div class="admin-actions" style="display: ${isAdmin ? 'block' : 'none'};">
+              <label>Edit Plays:</label>
+              <input type="number" id="plays-input-${g.id}" value="${g.plays || 0}" min="0" />
+              <button class="save-btn" style="font-size: 0.75rem; padding: 4px;" onclick="updatePlays('${g.id}')">💾 Save Plays</button>
+              <button class="danger" style="margin-top: 4px; font-size: 0.75rem; padding: 4px;" onclick="removeGame('${g.id}')">🗑️ Delete</button>
             </div>
           </div>
         </div>
       `).join('');
     }
 
-    async function launchGame(id) {
-      await fetch(`${API}/games/${id}/play`, { method: "POST" });
-      const game = games.find(g => g.id === id);
-      if (game) {
-        game.plays = (game.plays || 0) + 1;
-        document.getElementById("player-title").innerText = `Playing: ${game.icon} ${game.title}`;
-        document.getElementById("game-frame").src = game.url;
-        activeGameUrl = game.url;
-        document.getElementById("player-section").style.display = "block";
-        document.getElementById("player-section").scrollIntoView({ behavior: 'smooth' });
-        render();
+    function play(id) {
+      const g = games.find(x => x.id === id);
+      if (!g) return;
+      g.plays = (parseInt(g.plays) || 0) + 1;
+      activeUrl = g.url;
+      document.getElementById("player-name").innerText = `Playing: ${g.icon} ${g.title}`;
+      document.getElementById("game-frame").src = g.url;
+      document.getElementById("player-section").style.display = "block";
+      document.getElementById("player-section").scrollIntoView({ behavior: 'smooth' });
+      save();
+    }
+
+    function updatePlays(id) {
+      const input = document.getElementById(`plays-input-${id}`);
+      const val = parseInt(input.value);
+      const g = games.find(x => x.id === id);
+      if (g && !isNaN(val) && val >= 0) {
+        g.plays = val;
+        save();
       }
     }
 
@@ -167,75 +177,54 @@
       document.getElementById("game-frame").src = "";
     }
 
-    function openFullscreen() {
-      if (activeGameUrl) window.open(activeGameUrl, "_blank");
+    function openTab() {
+      if (activeUrl) window.open(activeUrl, "_blank");
     }
 
-    async function login() {
-      const u = document.getElementById("username").value;
-      const p = document.getElementById("password").value;
-      try {
-        const res = await fetch(`${API}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username: u, password: p })
-        });
-        if (res.ok) {
-          isAdmin = true;
-          document.getElementById("login-panel").style.display = "none";
-          document.getElementById("admin-panel").style.display = "block";
-          render();
-        } else {
-          alert("Invalid Username or Password");
-        }
-      } catch (err) {
-        alert("Backend server not responding.");
+    function login() {
+      const u = document.getElementById("user").value;
+      const p = document.getElementById("pass").value;
+      if (u === "Keshav" && p === "QWERTYUIOPASDFGHJKLZXCVBNM") {
+        isAdmin = true;
+        document.getElementById("login-box").style.display = "none";
+        document.getElementById("admin-box").style.display = "block";
+        render();
+      } else {
+        alert("Invalid login credentials.");
       }
     }
 
     function logout() {
       isAdmin = false;
-      document.getElementById("login-panel").style.display = "block";
-      document.getElementById("admin-panel").style.display = "none";
+      document.getElementById("login-box").style.display = "block";
+      document.getElementById("admin-box").style.display = "none";
       render();
     }
 
-    async function addGame() {
-      const title = document.getElementById("new-title").value;
-      const url = document.getElementById("new-url").value;
-      const icon = document.getElementById("new-icon").value;
-      const plays = parseInt(document.getElementById("new-plays").value) || 0;
-
+    function addGame() {
+      const title = document.getElementById("g-title").value;
+      const url = document.getElementById("g-url").value;
+      const icon = document.getElementById("g-icon").value;
+      const plays = parseInt(document.getElementById("g-plays").value) || 0;
       if (!title || !url) return alert("Please provide Title and URL.");
-      await fetch(`${API}/games`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, url, icon, plays })
-      });
-      loadGames();
+      games.unshift({ id: `game_${Date.now()}`, title, url, icon, plays });
+      document.getElementById("g-title").value = "";
+      document.getElementById("g-url").value = "";
+      document.getElementById("g-plays").value = "0";
+      save();
     }
 
-    async function updatePlays(id) {
-      const plays = parseInt(document.getElementById(`plays-${id}`).value) || 0;
-      await fetch(`${API}/games/${id}/plays`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plays })
-      });
-      loadGames();
+    function removeGame(id) {
+      games = games.filter(g => g.id !== id);
+      save();
     }
 
-    async function deleteGame(id) {
-      await fetch(`${API}/games/${id}`, { method: "DELETE" });
-      loadGames();
+    function resetGames() {
+      games = [...INITIAL_GAMES];
+      save();
     }
 
-    async function resetGames() {
-      await fetch(`${API}/games/reset`, { method: "POST" });
-      loadGames();
-    }
-
-    loadGames();
+    render();
   </script>
 </body>
 </html>
