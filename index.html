@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlayHub - Free Online Games</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    header {
+      background-color: #0b1120;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo { font-size: 1.5rem; font-weight: 800; color: var(--accent); cursor: pointer; }
+    .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
+    button {
+      background-color: var(--accent);
+      color: #000;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover { background-color: var(--accent-hover); }
+    .btn-secondary { background-color: #334155; color: var(--text); }
+    .btn-secondary:hover { background-color: #475569; }
+    .btn-danger { background-color: var(--danger); color: #fff; }
+    .btn-danger:hover { background-color: #dc2626; }
+
+    main { padding: 2rem; flex: 1; max-width: 1300px; margin: 0 auto; width: 100%; }
+    .stats-bar {
+      margin-bottom: 2rem;
+      background: var(--card-bg);
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+    .game-card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #334155;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+    .game-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      border-color: var(--accent);
+    }
+    .card-thumb {
+      height: 140px;
+      background: linear-gradient(135deg, #1e3a8a, #0284c7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+    }
+    .card-info { padding: 1rem; }
+    .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .card-plays { font-size: 0.85rem; color: var(--text-muted); }
+
+    .admin-edit-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      z-index: 5;
+    }
+    .admin-edit-btn:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-box {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid #334155;
+    }
+    .modal-box h2 { margin-bottom: 1rem; font-size: 1.3rem; }
+    .input-group { margin-bottom: 1rem; }
+    .input-group label { display: block; margin-bottom: 0.25rem; font-size: 0.85rem; color: var(--text-muted); }
+    .input-group input {
+      width: 100%;
+      padding: 0.6rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #fff;
+    }
+
+    .player-container {
+      width: 90vw;
+      height: 90vh;
+      max-width: 1200px;
+      background: #000;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid #334155;
+    }
+    .player-header {
+      padding: 0.75rem 1.5rem;
+      background: #0b1120;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .player-frame { width: 100%; flex: 1; border: none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo" onclick="location.reload()">🎮 PlayHub</div>
+    <div class="nav-actions" id="nav-actions"></div>
+  </header>
+
+  <main>
+    <div class="stats-bar">
+      <span>Total Site Gameplays: <b id="total-plays">0</b></span>
+      <span id="user-badge" style="color: var(--accent);">Guest Mode</span>
+    </div>
+
+    <div class="game-grid" id="game-grid"></div>
+  </main>
+
+  <!-- Login Modal -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal-box">
+      <h2>Account Login</h2>
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="login-username" placeholder="Enter username" />
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Enter password" />
+      </div>
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button class="btn-secondary" onclick="closeModal('login-modal')">Cancel</button>
+        <button onclick="handleLogin()">Log In</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Add Game Modal -->
+  <div class="modal-overlay" id="admin-modal">
+    <div class="modal-box">
+      <h2>Add New Web Game</h2>
+      <div class="input-group">
+        <label>Game Title</label>
+        <input type="text" id="new-game-title" placeholder="e.g. Chess Adapt" />
+      </div>
+      <div class="input-group">
+        <label>Game URL (iframe target)</label>
+        <input type="url" id="new-game-url" placeholder="https://..." />
+      </div>
+      <div class="input-group">
+        <label>Initial Plays (Optional)</label>
+        <input type="number" id="new-game-plays" value="0" min="0" />
+      </div>
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button class="btn-secondary" onclick="closeModal('admin-modal')">Close</button>
+        <button onclick="handleAddGame()">Add Game</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Set Plays Modal -->
+  <div class="modal-overlay" id="set-plays-modal">
+    <div class="modal-box">
+      <h2>Override Game Plays</h2>
+      <p id="edit-game-name" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;"></p>
+      <input type="hidden" id="edit-game-id" />
+      <div class="input-group">
+        <label>New Play Count</label>
+        <input type="number" id="edit-game-plays" min="0" />
+      </div>
+      <div style="display: flex; gap: 0.5rem; justify-content: space-between; margin-top: 1.5rem;">
+        <button class="btn-danger" onclick="resetCurrentGamePlays()">Reset to 0</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn-secondary" onclick="closeModal('set-plays-modal')">Cancel</button>
+          <button onclick="savePlayCount()">Save Count</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Game Player -->
+  <div class="modal-overlay" id="player-modal">
+    <div class="player-container">
+      <div class="player-header">
+        <span id="player-title" style="font-weight: 700;">Playing Game</span>
+        <button class="btn-secondary" onclick="closePlayer()">✕ Close Game</button>
+      </div>
+      <iframe id="game-frame" class="player-frame" src="" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script>
+    const INITIAL_GAMES = [
+      {
+        id: "game_chess_adapt",
+        title: "Chess Adapt",
+        url: "https://mycreateforme-dotcom.github.io/Chess-Adapt-/",
+        icon: "♟️",
+        plays: 0
+      }
+    ];
+
+    let games = JSON.parse(localStorage.getItem('playhub_games')) || INITIAL_GAMES;
+    let currentUser = localStorage.getItem('playhub_user') || null;
+
+    function calculateTotalPlays() {
+      return games.reduce((sum, g) => sum + (parseInt(g.plays, 10) || 0), 0);
+    }
+
+    function renderNav() {
+      const nav = document.getElementById('nav-actions');
+      const badge = document.getElementById('user-badge');
+
+      if (currentUser === 'Keshav') {
+        badge.innerText = 'Leader Admin: Keshav';
+        nav.innerHTML = `
+          <button onclick="openModal('admin-modal')">+ Add Game</button>
+          <button class="btn-secondary" onclick="handleLogout()">Logout</button>
+        `;
+      } else if (currentUser) {
+        badge.innerText = `User: ${currentUser}`;
+        nav.innerHTML = `<button class="btn-secondary" onclick="handleLogout()">Logout</button>`;
+      } else {
+        badge.innerText = 'Guest Mode';
+        nav.innerHTML = `<button class="btn-secondary" onclick="openModal('login-modal')">Login</button>`;
+      }
+    }
+
+    function renderGames() {
+      const grid = document.getElementById('game-grid');
+      const totalDisplay = document.getElementById('total-plays');
+      totalDisplay.innerText = calculateTotalPlays().toLocaleString();
+
+      grid.innerHTML = games.map(game => `
+        <div class="game-card" onclick="launchGame('${game.id}')">
+          ${currentUser === 'Keshav' ? `
+            <button class="admin-edit-btn" onclick="event.stopPropagation(); openEditPlaysModal('${game.id}')">
+              ✏️ Edit Plays
+            </button>
+          ` : ''}
+          <div class="card-thumb">${game.icon || '🕹️'}</div>
+          <div class="card-info">
+            <div class="card-title">${game.title}</div>
+            <div class="card-plays">${(parseInt(game.plays, 10) || 0).toLocaleString()} plays</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function launchGame(gameId) {
+      const game = games.find(g => g.id === gameId);
+      if (!game) return;
+
+      game.plays = (parseInt(game.plays, 10) || 0) + 1;
+      localStorage.setItem('playhub_games', JSON.stringify(games));
+
+      renderGames();
+      document.getElementById('player-title').innerText = game.title;
+      document.getElementById('game-frame').src = game.url;
+      document.getElementById('player-modal').style.display = 'flex';
+    }
+
+    function closePlayer() {
+      document.getElementById('game-frame').src = '';
+      document.getElementById('player-modal').style.display = 'none';
+    }
+
+    function handleLogin() {
+      const user = document.getElementById('login-username').value.trim();
+      const pass = document.getElementById('login-password').value.trim();
+
+      if (!user) return alert('Enter a username');
+
+      if (user === 'Keshav') {
+        if (pass === 'QWERTYUIOPASDFGHJKLZXCVBNM') {
+          currentUser = 'Keshav';
+          localStorage.setItem('playhub_user', currentUser);
+          closeModal('login-modal');
+          renderNav();
+          renderGames();
+        } else {
+          alert('Invalid password for Admin Keshav!');
+        }
+      } else {
+        currentUser = user;
+        localStorage.setItem('playhub_user', currentUser);
+        closeModal('login-modal');
+        renderNav();
+        renderGames();
+      }
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      localStorage.removeItem('playhub_user');
+      renderNav();
+      renderGames();
+    }
+
+    function handleAddGame() {
+      const title = document.getElementById('new-game-title').value.trim();
+      const url = document.getElementById('new-game-url').value.trim();
+      const initialPlays = parseInt(document.getElementById('new-game-plays').value, 10) || 0;
+
+      if (!title || !url) return alert('Provide both title and valid URL');
+
+      const newGame = {
+        id: 'game_' + Date.now(),
+        title: title,
+        url: url,
+        icon: '🎮',
+        plays: initialPlays
+      };
+
+      games.unshift(newGame);
+      localStorage.setItem('playhub_games', JSON.stringify(games));
+      
+      document.getElementById('new-game-title').value = '';
+      document.getElementById('new-game-url').value = '';
+      document.getElementById('new-game-plays').value = '0';
+      closeModal('admin-modal');
+      renderGames();
+    }
+
+    function openEditPlaysModal(gameId) {
+      const game = games.find(g => g.id === gameId);
+      if (!game) return;
+
+      document.getElementById('edit-game-id').value = game.id;
+      document.getElementById('edit-game-name').innerText = `Editing plays for: ${game.title}`;
+      document.getElementById('edit-game-plays').value = game.plays || 0;
+      openModal('set-plays-modal');
+    }
+
+    function savePlayCount() {
+      const gameId = document.getElementById('edit-game-id').value;
+      const count = parseInt(document.getElementById('edit-game-plays').value, 10);
+
+      if (isNaN(count) || count < 0) return alert('Enter a valid play count');
+
+      const game = games.find(g => g.id === gameId);
+      if (game) {
+        game.plays = count;
+        localStorage.setItem('playhub_games', JSON.stringify(games));
+        closeModal('set-plays-modal');
+        renderGames();
+      }
+    }
+
+    function resetCurrentGamePlays() {
+      const gameId = document.getElementById('edit-game-id').value;
+      const game = games.find(g => g.id === gameId);
+      if (game) {
+        game.plays = 0;
+        localStorage.setItem('playhub_games', JSON.stringify(games));
+        closeModal('set-plays-modal');
+        renderGames();
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // Init
+    renderNav();
+    renderGames();
+  </script>
+</body>
+</html>
