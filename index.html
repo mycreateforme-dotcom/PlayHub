@@ -96,7 +96,13 @@
           <button class="danger" onclick="closePlayer()">✕ Close</button>
         </div>
       </div>
-      <iframe id="game-frame" src="" allow="camera; microphone; fullscreen; autoplay; display-capture" allowfullscreen></iframe>
+      <!-- Explicit camera, mic, and sensor permissions allowed across origins -->
+      <iframe 
+        id="game-frame" 
+        src="" 
+        allow="camera *; microphone *; fullscreen *; autoplay *; display-capture *; accelerometer *; gyroscope *" 
+        allowfullscreen>
+      </iframe>
     </section>
 
     <div class="grid" id="grid"></div>
@@ -104,20 +110,19 @@
 
   <script>
     const INITIAL_GAMES = [
-      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "icon": "🖐️", "plays": 480},
-      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "icon": "🚀", "plays": 310},
-      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "icon": "🏓", "plays": 215},
-      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "icon": "♟️", "plays": 185},
-      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "icon": "💥", "plays": 150},
-      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "icon": "🏄", "plays": 125},
-      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "icon": "🪐", "plays": 95},
-      {"id": "game_stell_titans", "title": "Stell Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "icon": "🤖", "plays": 75},
-      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "icon": "⚡", "plays": 65},
-      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "icon": "⚔️", "plays": 35}
+      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "icon": "🖐️", "plays": 526},
+      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "icon": "🚀", "plays": 334},
+      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "icon": "🏓", "plays": 233},
+      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "icon": "♟️", "plays": 198},
+      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "icon": "💥", "plays": 162},
+      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "icon": "🏄", "plays": 135},
+      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "icon": "🪐", "plays": 102},
+      {"id": "game_stell_titans", "title": "Stell Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "icon": "🤖", "plays": 81},
+      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "icon": "⚡", "plays": 70},
+      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "icon": "⚔️", "plays": 38}
     ];
 
-    // Version key to guarantee updated play numbers override old browser storage
-    const STORAGE_KEY = "playhub_games_v2";
+    const STORAGE_KEY = "playhub_games_v4";
     let games = JSON.parse(localStorage.getItem(STORAGE_KEY)) || INITIAL_GAMES;
     let isAdmin = false;
     let activeUrl = "";
