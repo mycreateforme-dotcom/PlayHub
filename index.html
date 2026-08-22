@@ -137,25 +137,41 @@
       color: #fff;
     }
 
+    /* Game Player Overlay - Full Dynamic Viewport */
     .player-container {
-      width: 90vw;
-      height: 90vh;
-      max-width: 1200px;
+      width: 96vw;
+      height: 94vh;
       background: #000;
       border-radius: 12px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
       border: 1px solid #334155;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
     }
     .player-header {
-      padding: 0.75rem 1.5rem;
+      padding: 0.6rem 1.2rem;
       background: #0b1120;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-bottom: 1px solid #1e293b;
     }
-    .player-frame { width: 100%; flex: 1; border: none; }
+    .player-frame-wrapper {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #000;
+      overflow: auto;
+    }
+    .player-frame {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      border: none;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -199,7 +215,7 @@
       <h2>Add New Web Game</h2>
       <div class="input-group">
         <label>Game Title</label>
-        <input type="text" id="new-game-title" placeholder="e.g. Chess Adapt" />
+        <input type="text" id="new-game-title" placeholder="e.g. Space Odyssey" />
       </div>
       <div class="input-group">
         <label>Game URL (iframe target)</label>
@@ -241,9 +257,14 @@
     <div class="player-container">
       <div class="player-header">
         <span id="player-title" style="font-weight: 700;">Playing Game</span>
-        <button class="btn-secondary" onclick="closePlayer()">✕ Close Game</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn-secondary" onclick="openGameNewTab()">⤢ New Tab</button>
+          <button class="btn-secondary" onclick="closePlayer()">✕ Close</button>
+        </div>
       </div>
-      <iframe id="game-frame" class="player-frame" src="" allowfullscreen></iframe>
+      <div class="player-frame-wrapper">
+        <iframe id="game-frame" class="player-frame" src="" allowfullscreen allow="camera; microphone; fullscreen; gamepad; xr-spatial-tracking"></iframe>
+      </div>
     </div>
   </div>
 
@@ -255,11 +276,90 @@
         url: "https://mycreateforme-dotcom.github.io/Chess-Adapt-/",
         icon: "♟️",
         plays: 0
+      },
+      {
+        id: "game_cfm",
+        title: "HYPERSPACE 3D",
+        url: "https://mycreateforme-dotcom.github.io/GameCFM/",
+        icon: "🚀",
+        plays: 0
+      },
+      {
+        id: "game_cress",
+        title: "Cress",
+        url: "https://mycreateforme-dotcom.github.io/cress/",
+        icon: "⚔️",
+        plays: 0
+      },
+      {
+        id: "game_stell_titans",
+        title: "Stell Titans 3D",
+        url: "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/",
+        icon: "🤖",
+        plays: 0
+      },
+      {
+        id: "game_hand_gesture_slicer",
+        title: "Hand Gesture Slicer",
+        url: "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/",
+        icon: "🖐️",
+        plays: 0
+      },
+      {
+        id: "game_neuro_clash",
+        title: "Neuro Clash",
+        url: "https://mycreateforme-dotcom.github.io/Nuero-Clash/",
+        icon: "⚡",
+        plays: 0
+      },
+      {
+        id: "game_cyber_pong",
+        title: "Cyber Pong Overdrive",
+        url: "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/",
+        icon: "🏓",
+        plays: 0
+      },
+      {
+        id: "game_cyber_force_3d",
+        title: "Cyber Force 3D",
+        url: "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/",
+        icon: "💥",
+        plays: 0
+      },
+      {
+        id: "game_cyber_glide",
+        title: "Cyber Glide",
+        url: "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/",
+        icon: "🏄",
+        plays: 0
+      },
+      {
+        id: "game_space_conquest",
+        title: "Space Conquest",
+        url: "https://mycreateforme-dotcom.github.io/Space-Conquest/",
+        icon: "🪐",
+        plays: 0
       }
     ];
 
-    let games = JSON.parse(localStorage.getItem('playhub_games')) || INITIAL_GAMES;
+    let storedGames = JSON.parse(localStorage.getItem('playhub_games')) || [];
+    let gamesMap = new Map();
+
+    INITIAL_GAMES.forEach(g => gamesMap.set(g.id, { ...g }));
+
+    storedGames.forEach(g => {
+      if (gamesMap.has(g.id)) {
+        gamesMap.get(g.id).plays = g.plays;
+      } else {
+        gamesMap.set(g.id, g);
+      }
+    });
+
+    let games = Array.from(gamesMap.values());
+    localStorage.setItem('playhub_games', JSON.stringify(games));
+
     let currentUser = localStorage.getItem('playhub_user') || null;
+    let currentActiveGameUrl = '';
 
     function calculateTotalPlays() {
       return games.reduce((sum, g) => sum + (parseInt(g.plays, 10) || 0), 0);
@@ -313,13 +413,21 @@
       localStorage.setItem('playhub_games', JSON.stringify(games));
 
       renderGames();
+      currentActiveGameUrl = game.url;
       document.getElementById('player-title').innerText = game.title;
       document.getElementById('game-frame').src = game.url;
       document.getElementById('player-modal').style.display = 'flex';
     }
 
+    function openGameNewTab() {
+      if (currentActiveGameUrl) {
+        window.open(currentActiveGameUrl, '_blank');
+      }
+    }
+
     function closePlayer() {
       document.getElementById('game-frame').src = '';
+      currentActiveGameUrl = '';
       document.getElementById('player-modal').style.display = 'none';
     }
 
@@ -419,7 +527,6 @@
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    // Init
     renderNav();
     renderGames();
   </script>
