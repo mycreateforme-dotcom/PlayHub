@@ -3,7 +3,6 @@ import streamlit.components.v1 as components
 import json
 import os
 
-# --- PAGE CONFIG ---
 st.set_page_config(
     page_title="PlayHub - Online Games",
     page_icon="🎮",
@@ -28,15 +27,20 @@ INITIAL_GAMES = [
     {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "icon": "🪐", "plays": 0}
 ]
 
-# --- DATABASE HELPERS ---
+# --- BULLETPROOF DB HANDLERS ---
 def load_games():
     if not os.path.exists(DB_FILE):
         save_games(INITIAL_GAMES)
         return INITIAL_GAMES
     try:
         with open(DB_FILE, "r") as f:
-            return json.load(f)
+            data = json.load(f)
+            if not isinstance(data, list) or len(data) == 0:
+                save_games(INITIAL_GAMES)
+                return INITIAL_GAMES
+            return data
     except Exception:
+        save_games(INITIAL_GAMES)
         return INITIAL_GAMES
 
 def save_games(games_list):
@@ -47,22 +51,22 @@ def increment_play(game_id):
     games = load_games()
     for g in games:
         if g["id"] == game_id:
-            g["plays"] += 1
+            g["plays"] = g.get("plays", 0) + 1
             break
     save_games(games)
 
-# --- SESSION STATE INITIALIZATION ---
+# --- SESSION STATE ---
 if "active_game" not in st.session_state:
     st.session_state.active_game = None
 if "is_admin" not in st.session_state:
     st.session_state.is_admin = False
 
-# --- SIDEBAR: AUTH & ADMIN TOOLS ---
+# --- SIDEBAR (ADMIN & LOGIN) ---
 with st.sidebar:
-    st.title("🎮 PlayHub Menu")
+    st.title("🎮 PlayHub Admin")
     
     if not st.session_state.is_admin:
-        st.subheader("Leader Admin Login")
+        st.subheader("Login")
         user_input = st.text_input("Username")
         pass_input = st.text_input("Password", type="password")
         if st.button("Log In", use_container_width=True):
@@ -71,9 +75,9 @@ with st.sidebar:
                 st.success("Welcome Leader Admin Keshav!")
                 st.rerun()
             else:
-                st.error("Invalid credentials.")
+                st.error("Invalid Username or Password.")
     else:
-        st.success("Logged in as **Leader Admin (Keshav)**")
+        st.success("🟢 Logged in as: **Keshav**")
         if st.button("Log Out", use_container_width=True):
             st.session_state.is_admin = False
             st.rerun()
@@ -89,7 +93,7 @@ with st.sidebar:
             if new_title and new_url:
                 games = load_games()
                 new_entry = {
-                    "id": f"game_{len(games)}_{int(os.times()[4])}",
+                    "id": f"game_{len(games)}_{abs(hash(new_title)) % 10000}",
                     "title": new_title,
                     "url": new_url,
                     "icon": new_icon,
@@ -100,31 +104,36 @@ with st.sidebar:
                 st.success(f"Added {new_title}!")
                 st.rerun()
             else:
-                st.warning("Please fill in both Title and URL.")
+                st.warning("Please provide Title and URL.")
+                
+        if st.button("🔄 Reset All to Defaults", use_container_width=True):
+            save_games(INITIAL_GAMES)
+            st.success("Reset completed!")
+            st.rerun()
 
-# --- MAIN DASHBOARD ---
+# --- MAIN SCREEN ---
 games = load_games()
 total_global_plays = sum(g.get("plays", 0) for g in games)
 
-col_title, col_stat = st.columns([3, 1])
-with col_title:
+col1, col2 = st.columns([3, 1])
+with col1:
     st.title("🎮 PlayHub")
-    st.caption("Click any game below to play directly in your browser without logging in.")
-with col_stat:
+    st.write("Click any game below to play directly in your browser without logging in.")
+with col2:
     st.metric("Total Global Plays", f"{total_global_plays:,}")
 
 st.markdown("---")
 
-# --- GAME PLAYER OVERLAY ---
+# --- GAME ACTIVE PLAYER ---
 if st.session_state.active_game:
     active = next((g for g in games if g["id"] == st.session_state.active_game), None)
     if active:
-        col_header, col_btn1, col_btn2 = st.columns([4, 1, 1])
-        with col_header:
+        p_col1, p_col2, p_col3 = st.columns([4, 1, 1])
+        with p_col1:
             st.subheader(f"Playing: {active['icon']} {active['title']}")
-        with col_btn1:
+        with p_col2:
             st.link_button("⤢ Open in Full Tab", active["url"], use_container_width=True)
-        with col_btn2:
+        with p_col3:
             if st.button("✕ Close Game", use_container_width=True):
                 st.session_state.active_game = None
                 st.rerun()
@@ -132,7 +141,7 @@ if st.session_state.active_game:
         components.iframe(active["url"], height=700, scrolling=True)
         st.markdown("---")
 
-# --- GAME CATALOG GRID ---
+# --- GAME CARDS GRID ---
 cols_per_row = 4
 for i in range(0, len(games), cols_per_row):
     row_games = games[i : i + cols_per_row]
@@ -150,22 +159,21 @@ for i in range(0, len(games), cols_per_row):
                     st.session_state.active_game = game["id"]
                     st.rerun()
                 
-                # Admin controls per card
                 if st.session_state.is_admin:
-                    with st.expander("⚙️ Admin Controls"):
-                        new_count = st.number_input("Override Plays", min_value=0, value=game["plays"], key=f"edit_{game['id']}")
-                        if st.button("Save Plays", key=f"save_{game['id']}"):
-                            current_games = load_games()
-                            for g in current_games:
+                    with st.expander("⚙️ Manage Game"):
+                        new_count = st.number_input("Plays", min_value=0, value=int(game.get("plays", 0)), key=f"edit_{game['id']}")
+                        if st.button("Save", key=f"save_{game['id']}"):
+                            curr = load_games()
+                            for g in curr:
                                 if g["id"] == game["id"]:
                                     g["plays"] = int(new_count)
                                     break
-                            save_games(current_games)
+                            save_games(curr)
                             st.rerun()
                         
-                        if st.button("🗑️ Delete Game", key=f"del_{game['id']}", type="primary"):
-                            current_games = [g for g in load_games() if g["id"] != game["id"]]
-                            save_games(current_games)
+                        if st.button("🗑️ Delete", key=f"del_{game['id']}", type="primary"):
+                            curr = [g for g in load_games() if g["id"] != game["id"]]
+                            save_games(curr)
                             if st.session_state.active_game == game["id"]:
                                 st.session_state.active_game = None
                             st.rerun()
