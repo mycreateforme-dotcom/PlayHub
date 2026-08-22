@@ -13,6 +13,7 @@
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --danger: #ef4444;
+      --warning: #f59e0b;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
@@ -43,6 +44,8 @@
     button:hover { background-color: var(--accent-hover); }
     .btn-secondary { background-color: #334155; color: var(--text); }
     .btn-secondary:hover { background-color: #475569; }
+    .btn-warning { background-color: var(--warning); color: #000; }
+    .btn-warning:hover { background-color: #d97706; }
     .btn-danger { background-color: var(--danger); color: #fff; }
     .btn-danger:hover { background-color: #dc2626; }
 
@@ -122,7 +125,7 @@
       padding: 2rem;
       border-radius: 12px;
       width: 100%;
-      max-width: 420px;
+      max-width: 460px;
       border: 1px solid #334155;
     }
     .modal-box h2 { margin-bottom: 1rem; font-size: 1.3rem; }
@@ -137,7 +140,6 @@
       color: #fff;
     }
 
-    /* Game Player Overlay - Full Dynamic Viewport */
     .player-container {
       width: 96vw;
       height: 94vh;
@@ -232,21 +234,23 @@
     </div>
   </div>
 
-  <!-- Admin Set Plays Modal -->
+  <!-- Admin Manage/Edit Game Modal -->
   <div class="modal-overlay" id="set-plays-modal">
     <div class="modal-box">
-      <h2>Override Game Plays</h2>
+      <h2>Manage Game</h2>
       <p id="edit-game-name" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;"></p>
       <input type="hidden" id="edit-game-id" />
       <div class="input-group">
-        <label>New Play Count</label>
+        <label>Play Count</label>
         <input type="number" id="edit-game-plays" min="0" />
       </div>
-      <div style="display: flex; gap: 0.5rem; justify-content: space-between; margin-top: 1.5rem;">
-        <button class="btn-danger" onclick="resetCurrentGamePlays()">Reset to 0</button>
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
+        <button class="btn-danger" onclick="deleteCurrentGame()">🗑️ Delete Game</button>
         <div style="display: flex; gap: 0.5rem;">
+          <button class="btn-warning" onclick="resetCurrentGamePlays()">Reset to 0</button>
           <button class="btn-secondary" onclick="closeModal('set-plays-modal')">Cancel</button>
-          <button onclick="savePlayCount()">Save Count</button>
+          <button onclick="savePlayCount()">Save</button>
         </div>
       </div>
     </div>
@@ -342,21 +346,16 @@
       }
     ];
 
-    let storedGames = JSON.parse(localStorage.getItem('playhub_games')) || [];
-    let gamesMap = new Map();
+    let deletedIds = JSON.parse(localStorage.getItem('playhub_deleted_ids')) || [];
+    let storedGames = JSON.parse(localStorage.getItem('playhub_games'));
 
-    INITIAL_GAMES.forEach(g => gamesMap.set(g.id, { ...g }));
-
-    storedGames.forEach(g => {
-      if (gamesMap.has(g.id)) {
-        gamesMap.get(g.id).plays = g.plays;
-      } else {
-        gamesMap.set(g.id, g);
-      }
-    });
-
-    let games = Array.from(gamesMap.values());
-    localStorage.setItem('playhub_games', JSON.stringify(games));
+    let games = [];
+    if (storedGames) {
+      games = storedGames.filter(g => !deletedIds.includes(g.id));
+    } else {
+      games = INITIAL_GAMES.filter(g => !deletedIds.includes(g.id));
+      localStorage.setItem('playhub_games', JSON.stringify(games));
+    }
 
     let currentUser = localStorage.getItem('playhub_user') || null;
     let currentActiveGameUrl = '';
@@ -389,11 +388,16 @@
       const totalDisplay = document.getElementById('total-plays');
       totalDisplay.innerText = calculateTotalPlays().toLocaleString();
 
+      if (games.length === 0) {
+        grid.innerHTML = `<p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 2rem;">No games available. Add games from the admin panel.</p>`;
+        return;
+      }
+
       grid.innerHTML = games.map(game => `
         <div class="game-card" onclick="launchGame('${game.id}')">
           ${currentUser === 'Keshav' ? `
             <button class="admin-edit-btn" onclick="event.stopPropagation(); openEditPlaysModal('${game.id}')">
-              ✏️ Edit Plays
+              ⚙️ Manage
             </button>
           ` : ''}
           <div class="card-thumb">${game.icon || '🕹️'}</div>
@@ -493,7 +497,7 @@
       if (!game) return;
 
       document.getElementById('edit-game-id').value = game.id;
-      document.getElementById('edit-game-name').innerText = `Editing plays for: ${game.title}`;
+      document.getElementById('edit-game-name').innerText = `Managing: ${game.title}`;
       document.getElementById('edit-game-plays').value = game.plays || 0;
       openModal('set-plays-modal');
     }
@@ -522,6 +526,28 @@
         closeModal('set-plays-modal');
         renderGames();
       }
+    }
+
+    function deleteCurrentGame() {
+      const gameId = document.getElementById('edit-game-id').value;
+      const game = games.find(g => g.id === gameId);
+      if (!game) return;
+
+      const confirmDelete = confirm(`Are you sure you want to delete "${game.title}"? This cannot be undone.`);
+      if (!confirmDelete) return;
+
+      // Filter out game
+      games = games.filter(g => g.id !== gameId);
+
+      // Track deleted ID so default games aren't re-inserted on reload
+      if (!deletedIds.includes(gameId)) {
+        deletedIds.push(gameId);
+        localStorage.setItem('playhub_deleted_ids', JSON.stringify(deletedIds));
+      }
+
+      localStorage.setItem('playhub_games', JSON.stringify(games));
+      closeModal('set-plays-modal');
+      renderGames();
     }
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
