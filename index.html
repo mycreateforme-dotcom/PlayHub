@@ -99,7 +99,7 @@
       <iframe 
         id="game-frame" 
         src="" 
-        allow="camera *; microphone *; fullscreen *; autoplay *; display-capture *; accelerometer *; gyroscope *" 
+        allow="camera; microphone; fullscreen; autoplay; display-capture; accelerometer; gyroscope" 
         allowfullscreen>
       </iframe>
     </section>
@@ -122,7 +122,7 @@
       {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "icon": "⚔️", "plays": 158}
     ];
 
-    const STORAGE_KEY = "playhub_games_v8";
+    const STORAGE_KEY = "playhub_games_v9";
     let games = JSON.parse(localStorage.getItem(STORAGE_KEY)) || INITIAL_GAMES;
     let isAdmin = false;
     let activeUrl = "";
@@ -158,9 +158,25 @@
       `).join('');
     }
 
-    function play(id) {
+    async function ensureCameraPermission() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          stream.getTracks().forEach(track => track.stop());
+        } catch (err) {
+          console.warn("Camera permission prompt bypassed or denied by user:", err);
+        }
+      }
+    }
+
+    async function play(id) {
       const g = games.find(x => x.id === id);
       if (!g) return;
+
+      if (id === 'game_hand_gesture_slicer' || g.title.toLowerCase().includes('gesture') || g.title.toLowerCase().includes('camera')) {
+        await ensureCameraPermission();
+      }
+
       g.plays = (parseInt(g.plays) || 0) + 1;
       activeUrl = g.url;
       document.getElementById("player-name").innerText = `Playing: ${g.icon} ${g.title}`;
