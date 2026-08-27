@@ -8,73 +8,40 @@
     :root {
       --bg: #0e1117;
       --card-bg: #1e2530;
-      --sidebar-bg: #161b22;
       --primary: #ff4b4b;
       --text: #ffffff;
       --text-muted: #8b949e;
       --border: #30363d;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { display: flex; height: 100vh; background: var(--bg); color: var(--text); overflow: hidden; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    #sidebar { width: 300px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.85rem; margin-bottom: 4px; color: var(--text-muted); }
-    .form-group input, .form-group select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: #fff; }
-    button { width: 100%; padding: 8px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--primary); color: #fff; }
-    button.secondary { background: var(--card-bg); border: 1px solid var(--border); margin-top: 8px; }
-    button.save-btn { background: #238636; margin-top: 4px; }
-    button.danger { background: #d73a49; }
-
-    #main { flex: 1; padding: 24px; overflow-y: auto; }
-    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 20px; }
+    #main { max-width: 1200px; margin: 0 auto; padding: 20px 16px; }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 20px; gap: 12px; }
     .metric-value { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
 
     #player-section { margin-bottom: 24px; background: var(--card-bg); border-radius: 8px; padding: 16px; border: 1px solid var(--border); display: none; }
-    .player-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .player-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
     .player-actions { display: flex; gap: 8px; }
-    .player-actions button { width: auto; }
-    iframe { width: 100%; height: 600px; border: none; border-radius: 6px; background: #000; }
+    .player-actions button { width: auto; padding: 8px 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; }
+    button.secondary { background: #161b22; border: 1px solid var(--border); }
+    button.danger { background: #d73a49; }
+    iframe { width: 100%; height: 75vh; border: none; border-radius: 6px; background: #000; }
 
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
-    .icon { font-size: 2.5rem; }
-    .title { font-size: 1rem; margin: 6px 0; }
-    .plays { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
-    .admin-actions { display: none; margin-top: 8px; border-top: 1px dashed var(--border); padding-top: 8px; text-align: left; }
-    .admin-actions label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 2px; }
-    .admin-actions input { width: 100%; padding: 4px 6px; margin-bottom: 4px; background: var(--bg); color: #fff; border: 1px solid var(--border); border-radius: 4px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px 12px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
+    .icon { font-size: 2.2rem; }
+    .title { font-size: 0.95rem; font-weight: 600; margin: 4px 0; }
+    .plays { font-size: 0.8rem; color: var(--text-muted); }
+    .play-btn { width: 100%; padding: 8px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--primary); color: #fff; }
+
+    @media (max-width: 600px) {
+      .header { flex-direction: column; align-items: flex-start; }
+      iframe { height: 60vh; }
+    }
   </style>
 </head>
 <body>
-
-  <aside id="sidebar">
-    <h2 style="margin-bottom: 16px;">🎮 PlayHub Admin</h2>
-    <div id="login-box">
-      <div class="form-group"><label>Username</label><input type="text" id="user" /></div>
-      <div class="form-group"><label>Password</label><input type="password" id="pass" /></div>
-      <button onclick="login()">Log In</button>
-    </div>
-
-    <div id="admin-box" style="display: none;">
-      <p style="color: #4ade80; margin-bottom: 8px;">🟢 Admin: Keshav</p>
-      <button class="secondary" onclick="logout()">Log Out</button>
-      <hr style="border-color: var(--border); margin: 16px 0;" />
-      <h4 style="margin-bottom: 10px;">➕ Add New Game</h4>
-      <div class="form-group"><label>Title</label><input type="text" id="g-title" /></div>
-      <div class="form-group"><label>URL</label><input type="text" id="g-url" placeholder="https://..." /></div>
-      <div class="form-group">
-        <label>Icon</label>
-        <select id="g-icon">
-          <option>🎮</option><option>☀️</option><option>🚀</option><option>⚔️</option><option>🤖</option>
-          <option>⚡</option><option>🏓</option><option>💥</option><option>🏄</option><option>🪐</option><option>♟️</option><option>🖐️</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Initial Plays</label><input type="number" id="g-plays" value="0" min="0" /></div>
-      <button onclick="addGame()">Publish Game</button>
-      <button class="secondary" onclick="resetGames()">🔄 Reset to Defaults</button>
-    </div>
-  </aside>
 
   <main id="main">
     <div class="header">
@@ -82,9 +49,9 @@
         <h1>🎮 PlayHub</h1>
         <p style="color: var(--text-muted);">Click any game to play directly in your browser.</p>
       </div>
-      <div style="text-align: right;">
-        <div>Total Plays</div>
-        <div class="metric-value" id="total-count">0</div>
+      <div>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Total Plays</div>
+        <div class="metric-value" id="total-count">28,250</div>
       </div>
     </div>
 
@@ -109,22 +76,21 @@
 
   <script>
     const INITIAL_GAMES = [
-      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "icon": "♟️", "plays": 3453},
-      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "icon": "🖐️", "plays": 2111},
-      {"id": "game_solar_man", "title": "Solar Man", "url": "https://ritugnsolarman.netlify.app/", "icon": "☀️", "plays": 1002},
-      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "icon": "🚀", "plays": 961},
-      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "icon": "🏓", "plays": 657},
-      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "icon": "💥", "plays": 599},
-      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "icon": "🏄", "plays": 390},
-      {"id": "game_stell_titans", "title": "Stell Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "icon": "🤖", "plays": 374},
-      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "icon": "🪐", "plays": 306},
-      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "icon": "⚡", "plays": 227},
-      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "icon": "⚔️", "plays": 158}
+      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "icon": "🖐️", "plays": 5000},
+      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "icon": "♟️", "plays": 4500},
+      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "icon": "🚀", "plays": 4000},
+      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "icon": "🏓", "plays": 3500},
+      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "icon": "💥", "plays": 3000},
+      {"id": "game_stell_titans", "title": "Stell Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "icon": "🤖", "plays": 2500},
+      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "icon": "🪐", "plays": 2000},
+      {"id": "game_solar_man", "title": "Solar Man", "url": "https://ritugnsolarman.netlify.app/", "icon": "☀️", "plays": 1500},
+      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "icon": "🏄", "plays": 1000},
+      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "icon": "⚡", "plays": 750},
+      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "icon": "⚔️", "plays": 500}
     ];
 
-    const STORAGE_KEY = "playhub_games_v9";
+    const STORAGE_KEY = "playhub_games_v10";
     let games = JSON.parse(localStorage.getItem(STORAGE_KEY)) || INITIAL_GAMES;
-    let isAdmin = false;
     let activeUrl = "";
 
     function save() {
@@ -145,15 +111,7 @@
             <div class="title">${g.title}</div>
             <div class="plays">${(parseInt(g.plays) || 0).toLocaleString()} plays</div>
           </div>
-          <div>
-            <button onclick="play('${g.id}')">▶ Play</button>
-            <div class="admin-actions" style="display: ${isAdmin ? 'block' : 'none'};">
-              <label>Edit Plays:</label>
-              <input type="number" id="plays-input-${g.id}" value="${g.plays || 0}" min="0" />
-              <button class="save-btn" style="font-size: 0.75rem; padding: 4px;" onclick="updatePlays('${g.id}')">💾 Save Plays</button>
-              <button class="danger" style="margin-top: 4px; font-size: 0.75rem; padding: 4px;" onclick="removeGame('${g.id}')">🗑️ Delete</button>
-            </div>
-          </div>
+          <button class="play-btn" onclick="play('${g.id}')">▶ Play</button>
         </div>
       `).join('');
     }
@@ -164,7 +122,7 @@
           const stream = await navigator.mediaDevices.getUserMedia({ video: true });
           stream.getTracks().forEach(track => track.stop());
         } catch (err) {
-          console.warn("Camera permission prompt bypassed or denied by user:", err);
+          console.warn("Camera access denied or prompt bypassed:", err);
         }
       }
     }
@@ -186,16 +144,6 @@
       save();
     }
 
-    function updatePlays(id) {
-      const input = document.getElementById(`plays-input-${id}`);
-      const val = parseInt(input.value);
-      const g = games.find(x => x.id === id);
-      if (g && !isNaN(val) && val >= 0) {
-        g.plays = val;
-        save();
-      }
-    }
-
     function closePlayer() {
       document.getElementById("player-section").style.display = "none";
       document.getElementById("game-frame").src = "";
@@ -203,49 +151,6 @@
 
     function openTab() {
       if (activeUrl) window.open(activeUrl, "_blank");
-    }
-
-    function login() {
-      const u = document.getElementById("user").value;
-      const p = document.getElementById("pass").value;
-      if (u === "Keshav" && p === "QWERTYUIOPASDFGHJKLZXCVBNM") {
-        isAdmin = true;
-        document.getElementById("login-box").style.display = "none";
-        document.getElementById("admin-box").style.display = "block";
-        render();
-      } else {
-        alert("Invalid login credentials.");
-      }
-    }
-
-    function logout() {
-      isAdmin = false;
-      document.getElementById("login-box").style.display = "block";
-      document.getElementById("admin-box").style.display = "none";
-      render();
-    }
-
-    function addGame() {
-      const title = document.getElementById("g-title").value;
-      const url = document.getElementById("g-url").value;
-      const icon = document.getElementById("g-icon").value;
-      const plays = parseInt(document.getElementById("g-plays").value) || 0;
-      if (!title || !url) return alert("Please provide Title and URL.");
-      games.push({ id: `game_${Date.now()}`, title, url, icon, plays });
-      document.getElementById("g-title").value = "";
-      document.getElementById("g-url").value = "";
-      document.getElementById("g-plays").value = "0";
-      save();
-    }
-
-    function removeGame(id) {
-      games = games.filter(g => g.id !== id);
-      save();
-    }
-
-    function resetGames() {
-      games = [...INITIAL_GAMES];
-      save();
     }
 
     render();
