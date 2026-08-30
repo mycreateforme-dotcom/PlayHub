@@ -51,7 +51,7 @@
       </div>
       <div>
         <div style="font-size: 0.85rem; color: var(--text-muted);">Total Plays</div>
-        <div class="metric-value" id="total-count">28,250</div>
+        <div class="metric-value" id="total-count">39,383</div>
       </div>
     </div>
 
@@ -76,20 +76,20 @@
 
   <script>
     const INITIAL_GAMES = [
-      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "icon": "🖐️", "plays": 5000},
-      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "icon": "♟️", "plays": 4500},
-      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "icon": "🚀", "plays": 4000},
-      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "icon": "🏓", "plays": 3500},
-      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "icon": "💥", "plays": 3000},
-      {"id": "game_stell_titans", "title": "Stell Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "icon": "🤖", "plays": 2500},
-      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "icon": "🪐", "plays": 2000},
-      {"id": "game_solar_man", "title": "Solar Man", "url": "https://ritugnsolarman.netlify.app/", "icon": "☀️", "plays": 1500},
-      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "icon": "🏄", "plays": 1000},
-      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "icon": "⚡", "plays": 750},
-      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "icon": "⚔️", "plays": 500}
+      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "icon": "🖐️", "plays": 8750},
+      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "icon": "🚀", "plays": 7118},
+      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "icon": "🏓", "plays": 5007},
+      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "icon": "🏄", "plays": 4344},
+      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "icon": "💥", "plays": 4162},
+      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "icon": "♟️", "plays": 3802},
+      {"id": "game_stell_titans", "title": "Steel Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "icon": "🤖", "plays": 3378},
+      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "icon": "⚡", "plays": 1901},
+      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "icon": "🪐", "plays": 1719},
+      {"id": "game_solar_man", "title": "Solar Man", "url": "https://ritugnsolarman.netlify.app/", "icon": "☀️", "plays": 1629},
+      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "icon": "⚔️", "plays": 573}
     ];
 
-    const STORAGE_KEY = "playhub_games_v10";
+    const STORAGE_KEY = "playhub_games_v12";
     let games = JSON.parse(localStorage.getItem(STORAGE_KEY)) || INITIAL_GAMES;
     let activeUrl = "";
 
