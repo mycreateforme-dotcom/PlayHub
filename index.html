@@ -12,6 +12,8 @@
       --text: #ffffff;
       --text-muted: #8b949e;
       --border: #30363d;
+      --accent-green: #00a859;
+      --accent-green-bright: #00e676;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -19,6 +21,142 @@
     #main { max-width: 1200px; margin: 0 auto; padding: 20px 16px; }
     .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 20px; gap: 12px; }
     .metric-value { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+
+    /* ANIMATED CREATEFORME AD CONTAINER */
+    .ad-container {
+      background: linear-gradient(135deg, #151c24 0%, #0d131a 50%, #16241d 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 6s ease infinite;
+      border: 1px solid #23303d;
+      border-left: 5px solid var(--accent-green);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0, 168, 89, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .ad-container:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(0, 168, 89, 0.3);
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .ad-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .ad-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* PULSING HEXAGON LOGO ANIMATION */
+    .ad-logo-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--accent-green);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #fff;
+      font-size: 1.3rem;
+      box-shadow: -3px 3px 0px #4a5568;
+      animation: logoPulse 2.5s infinite ease-in-out;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px var(--accent-green)); }
+      50% { transform: scale(1.08); filter: drop-shadow(0 0 10px var(--accent-green-bright)); }
+    }
+
+    .ad-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+    }
+
+    .ad-title span {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .ad-sub {
+      font-size: 0.85rem;
+      color: #a0aec0;
+      margin-top: 2px;
+    }
+
+    .ad-badge {
+      position: absolute;
+      top: 6px;
+      right: 14px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    /* BUTTON GLOW ANIMATION */
+    .ad-btn {
+      background: linear-gradient(135deg, var(--accent-green), #007a41);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 168, 89, 0.4);
+    }
+
+    .ad-btn:hover {
+      box-shadow: 0 0 20px rgba(0, 230, 118, 0.8);
+      transform: scale(1.05);
+    }
+
+    /* TYPEWRITER TEXT PROMOTIONAL ROW BELOW BUTTON */
+    .typewriter-box {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      font-size: 0.88rem;
+      color: var(--accent-green-bright);
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 7px;
+      height: 15px;
+      background-color: var(--accent-green-bright);
+      margin-left: 2px;
+      animation: blink 0.7s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
 
     #player-section { margin-bottom: 24px; background: var(--card-bg); border-radius: 8px; padding: 16px; border: 1px solid var(--border); display: none; }
     .player-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
@@ -37,6 +175,8 @@
 
     @media (max-width: 600px) {
       .header { flex-direction: column; align-items: flex-start; }
+      .ad-top-row { flex-direction: column; align-items: flex-start; padding-top: 14px; }
+      .ad-btn { width: 100%; text-align: center; }
       iframe { height: 60vh; }
     }
   </style>
@@ -51,7 +191,30 @@
       </div>
       <div>
         <div style="font-size: 0.85rem; color: var(--text-muted);">Total Plays</div>
-        <div class="metric-value" id="total-count">39,383</div>
+        <div class="metric-value" id="total-count">0</div>
+      </div>
+    </div>
+
+    <!-- PROMOTIONAL AD FOR CREATEFORME WITH TYPEWRITER EFFECT -->
+    <div class="ad-container">
+      <span class="ad-badge">Sponsored</span>
+      
+      <div class="ad-top-row">
+        <div class="ad-brand">
+          <div class="ad-logo-icon">C</div>
+          <div>
+            <div class="ad-title">CREATE<span>FORME</span></div>
+            <div class="ad-sub">AI-driven creative solutions, custom interactive designs & web development.</div>
+          </div>
+        </div>
+        <a href="https://createforme.in/" target="_blank" class="ad-btn">Visit Website ➔</a>
+      </div>
+
+      <!-- TYPEWRITER TEXT ROW -->
+      <div class="typewriter-box">
+        <span>⚡ We create: </span>
+        <span id="typewriter-text"></span>
+        <span class="cursor"></span>
       </div>
     </div>
 
@@ -75,21 +238,64 @@
   </main>
 
   <script>
-    const INITIAL_GAMES = [
-      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "icon": "🖐️", "plays": 8750},
-      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "icon": "🚀", "plays": 7118},
-      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "icon": "🏓", "plays": 5007},
-      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "icon": "🏄", "plays": 4344},
-      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "icon": "💥", "plays": 4162},
-      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "icon": "♟️", "plays": 3802},
-      {"id": "game_stell_titans", "title": "Steel Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "icon": "🤖", "plays": 3378},
-      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "icon": "⚡", "plays": 1901},
-      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "icon": "🪐", "plays": 1719},
-      {"id": "game_solar_man", "title": "Solar Man", "url": "https://ritugnsolarman.netlify.app/", "icon": "☀️", "plays": 1629},
-      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "icon": "⚔️", "plays": 573}
+    // TYPEWRITER ANIMATION FOR CREATEFORME SERVICES
+    const services = [
+      "Custom Interactive Web Applications...",
+      "AI Image & Video Generation...",
+      "Creative Thumbnail Design...",
+      "Interactive 2D & 3D Web Games...",
+      "Ghost Writing & Custom Digital Content..."
     ];
 
-    const STORAGE_KEY = "playhub_games_v12";
+    let serviceIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    const typewriterElement = document.getElementById("typewriter-text");
+
+    function typeEffect() {
+      const currentService = services[serviceIndex];
+      
+      if (isDeleting) {
+        typewriterElement.textContent = currentService.substring(0, charIndex - 1);
+        charIndex--;
+      } else {
+        typewriterElement.textContent = currentService.substring(0, charIndex + 1);
+        charIndex++;
+      }
+
+      let speed = isDeleting ? 40 : 80;
+
+      if (!isDeleting && charIndex === currentService.length) {
+        speed = 2000; // Pause at full text
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        serviceIndex = (serviceIndex + 1) % services.length;
+        speed = 500;
+      }
+
+      setTimeout(typeEffect, speed);
+    }
+
+    // START TYPEWRITER ANIMATION
+    document.addEventListener("DOMContentLoaded", typeEffect);
+
+    // GAME LIST DATA
+    const INITIAL_GAMES = [
+      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "icon": "♟️", "plays": 9850},
+      {"id": "game_stell_titans", "title": "Steel Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "icon": "🤖", "plays": 8720},
+      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "icon": "🚀", "plays": 7640},
+      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "icon": "💥", "plays": 6410},
+      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "icon": "🏄", "plays": 5300},
+      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "icon": "🏓", "plays": 4250},
+      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "icon": "⚡", "plays": 3180},
+      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "icon": "🪐", "plays": 2450},
+      {"id": "game_solar_man", "title": "Solar Man", "url": "https://ritugnsolarman.netlify.app/", "icon": "☀️", "plays": 1820},
+      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "icon": "🖐️", "plays": 1150},
+      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "icon": "⚔️", "plays": 574}
+    ];
+
+    const STORAGE_KEY = "playhub_games_v15_typewriter";
     let games = JSON.parse(localStorage.getItem(STORAGE_KEY)) || INITIAL_GAMES;
     let activeUrl = "";
 
