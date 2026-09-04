@@ -155,14 +155,13 @@
       transform: translateZ(15px);
     }
 
-    /* ONE-BY-ONE SCROLL REVEAL (ACTIVETHEORY STYLING) */
+    /* ONE-BY-ONE SCROLL REVEAL */
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 32px; perspective: 1200px; }
     .card {
       background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
       overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative;
       cursor: pointer; transform-style: preserve-3d;
       
-      /* REVEAL ANIMATION ON SCROLL */
       opacity: 0;
       transform: translateY(100px) rotateX(-25deg) scale(0.85);
       transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
@@ -452,6 +451,7 @@
   </div>
 
   <script>
+    // IMAGE FILES ATTACHED DIRECTLY AS LOCAL RELATIVE PATHS
     const INITIAL_GAMES = [
       {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "img": "ChatGPT Image Sep 4, 2026 at 08_50_26 PM.png", "plays": 180, "timeSeconds": 21600, "rating": 4.9, "reviews": 342, "session": "10-15 mins", "tags": ["strategy", "chess", "board", "mind", "tactics", "ai", "brain"], "desc": "Tactical chess strategy with adaptive AI difficulty."},
       {"id": "game_stell_titans", "title": "Steel Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "img": "ChatGPT Image Sep 4, 2026 at 08_57_57 PM.png", "plays": 140, "timeSeconds": 15120, "rating": 4.7, "reviews": 215, "session": "8-12 mins", "tags": ["strategy", "action", "mech", "robot", "warfare", "3d", "shooting", "combat"], "desc": "3D mech warfare and futuristic tactical strategy battles."},
@@ -466,7 +466,7 @@
       {"id": "game_cress", "title": "Cress Pro", "url": "https://mycreateforme-dotcom.github.io/cress/", "img": "Gemini_Generated_Image_4tgkgm4tgkgm4tgk.png", "plays": 35, "timeSeconds": 2100, "rating": 4.9, "reviews": 46, "session": "2-4 mins", "tags": ["strategy", "puzzle", "arcade", "tactical", "precision"], "desc": "Futuristic mechanical structure and precision tactic challenge."}
     ];
 
-    const STORAGE_KEY = "playhub_games_v22_perfect";
+    const STORAGE_KEY = "playhub_games_v23_code_embedded";
     let games = JSON.parse(localStorage.getItem(STORAGE_KEY)) || INITIAL_GAMES;
     
     let activeUrl = "";
@@ -610,12 +610,10 @@
         grid.innerHTML = filtered.map(renderCardHTML).join('');
       }
 
-      // POPULATE MORE OPTIONS AT BOTTOM PERMANENTLY
       renderMoreOptionsSection();
       initScrollReveal();
     }
 
-    // UPDATE BOTTOM SECTION TO SHOW RELATED / MORE OPTIONS DYNAMICALLY
     function renderMoreOptionsSection() {
       const moreGrid = document.getElementById("more-options-grid");
       const titleEl = document.getElementById("more-options-title");
@@ -624,7 +622,6 @@
       if (activeGameId) {
         const activeGame = games.find(x => x.id === activeGameId);
         titleEl.innerText = `🔥 More Like "${activeGame ? activeGame.title : 'Selected Game'}"`;
-        // Recommend games sharing similar tags or other top games
         recommendations = games.filter(g => g.id !== activeGameId).slice(0, 4);
       } else {
         titleEl.innerText = `✨ Recommended & Top Choices`;
@@ -657,7 +654,6 @@
       document.getElementById("details-modal").style.display = "none";
     }
 
-    // DISSOLVE TRANSITION LOGIC WHEN GOING FROM ONE GAME TO ANOTHER
     function play(id) {
       const g = games.find(x => x.id === id);
       if (!g) return;
@@ -676,7 +672,6 @@
       document.getElementById("player-name").innerText = `Playing: ${g.title}`;
 
       if (isPlayerOpen) {
-        // Smooth dissolve dissolve transition between games
         statusText.innerText = `Loading ${g.title}...`;
         overlay.classList.add("active");
 
@@ -689,13 +684,11 @@
         }, 400);
 
       } else {
-        // Initial opening
         frame.src = g.url;
         playerSec.style.display = "block";
         playerSec.scrollIntoView({ behavior: 'smooth' });
       }
 
-      // Update timer logic
       clearInterval(playTimer);
       playTimer = setInterval(() => {
         if (activeGameId) {
@@ -708,7 +701,7 @@
       }, 1000);
 
       save();
-      renderMoreOptionsSection(); // Update bottom choices to reflect newly chosen game
+      renderMoreOptionsSection();
     }
 
     function closePlayer() {
