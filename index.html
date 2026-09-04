@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PlayHub - Home & Games Portal</title>
+  <title>PlayHub - 3D Games Portal</title>
   <style>
     :root {
       --bg: #0e1117;
@@ -15,115 +15,33 @@
       --accent-green: #00a859;
       --accent-green-bright: #00e676;
       --accent-blue: #00f0ff;
+      --accent-purple: #b000ff;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; perspective: 1200px; padding: 20px; }
 
-    /* 3D HOME PAGE / HERO SECTION */
-    #home-section {
-      min-height: 100vh;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 30px 20px;
-      position: relative;
-      background: radial-gradient(circle at center, #1b2838 0%, #0e1117 70%);
-      perspective: 1200px;
+    /* MAIN GAMES PORTAL CONTAINER */
+    #main { max-width: 1200px; margin: 0 auto; padding: 20px 0; transform-style: preserve-3d; }
+    
+    .header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      border-bottom: 1px solid var(--border); 
+      padding-bottom: 16px; 
+      margin-bottom: 24px; 
+      gap: 12px; 
+      flex-wrap: wrap; 
+      transform: translateZ(20px);
     }
-
-    .hero-title {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 900;
-      letter-spacing: 2px;
-      margin-bottom: 12px;
-      text-align: center;
-      background: linear-gradient(135deg, #fff 30%, var(--accent-blue));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 40px rgba(0, 240, 255, 0.4);
-      animation: titlePulse 3s infinite ease-in-out;
-    }
-
-    @keyframes titlePulse {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.5)); }
-      50% { transform: scale(1.03); filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.8)); }
-    }
-
-    .hero-subtitle {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      margin-bottom: 35px;
-      text-align: center;
-      max-width: 600px;
-    }
-
-    /* 3D ROTATING PHOTO GALLERY / SHOWCASE CAROUSEL */
-    .hero-carousel {
-      width: 280px;
-      height: 280px;
-      position: relative;
-      transform-style: preserve-3d;
-      animation: rotateCarousel 20s infinite linear;
-      margin-bottom: 50px;
-    }
-
-    @keyframes rotateCarousel {
-      0% { transform: rotateX(-10deg) rotateY(0deg); }
-      100% { transform: rotateX(-10deg) rotateY(360deg); }
-    }
-
-    .carousel-item {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      left: 0;
-      top: 0;
-      transform-style: preserve-3d;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 2px solid var(--accent-blue);
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
-      background: #000;
-    }
-
-    .carousel-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .explore-btn {
-      background: linear-gradient(135deg, var(--accent-blue), #0077ff);
-      color: #000;
-      padding: 14px 36px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 1.1rem;
-      font-weight: 800;
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
-      transition: all 0.3s ease;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .explore-btn:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 0 35px rgba(0, 240, 255, 0.8);
-    }
-
-    /* MAIN GAMES SECTION */
-    #main { max-width: 1200px; margin: 0 auto; padding: 40px 16px; display: none; }
-    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
-    .metrics-group { display: flex; gap: 20px; }
+    
+    .metrics-container { display: flex; gap: 20px; align-items: center; }
     .metric-box { text-align: right; }
-    .metric-value { font-size: 1.3rem; font-weight: bold; color: var(--primary); }
+    .metric-value { font-size: 1.3rem; font-weight: bold; color: var(--primary); text-shadow: 0 0 10px rgba(255, 75, 75, 0.4); }
+    .metric-value.time { color: var(--accent-blue); text-shadow: 0 0 10px rgba(0, 240, 255, 0.4); }
 
-    /* ANIMATED CREATEFORME AD CONTAINER */
+    /* 3D ANIMATED CREATEFORME AD CONTAINER */
     .ad-container {
       background: linear-gradient(135deg, #151c24 0%, #0d131a 50%, #16241d 100%);
       background-size: 200% 200%;
@@ -134,13 +52,15 @@
       padding: 18px 22px;
       margin-bottom: 24px;
       position: relative;
-      box-shadow: 0 4px 20px rgba(0, 168, 89, 0.15);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 8px 30px rgba(0, 168, 89, 0.2);
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+      transform: translateZ(25px);
     }
 
     .ad-container:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(0, 168, 89, 0.3);
+      transform: translateY(-5px) rotateX(2deg) rotateY(-2deg) translateZ(30px);
+      box-shadow: 0 15px 35px rgba(0, 168, 89, 0.4);
     }
 
     @keyframes gradientShift {
@@ -155,12 +75,12 @@
       width: 42px; height: 42px; background: var(--accent-green);
       clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
       display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: 1.3rem;
-      box-shadow: -3px 3px 0px #4a5568; animation: logoPulse 2.5s infinite ease-in-out;
+      box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.5); animation: logoPulse 2.5s infinite ease-in-out;
     }
 
     @keyframes logoPulse {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px var(--accent-green)); }
-      50% { transform: scale(1.08); filter: drop-shadow(0 0 10px var(--accent-green-bright)); }
+      0%, 100% { transform: scale(1) translateZ(0px); filter: drop-shadow(0 0 2px var(--accent-green)); }
+      50% { transform: scale(1.08) translateZ(10px); filter: drop-shadow(0 0 12px var(--accent-green-bright)); }
     }
 
     .ad-title { font-size: 1.2rem; font-weight: 800; letter-spacing: 0.5px; color: #ffffff; }
@@ -171,9 +91,9 @@
     .ad-btn {
       background: linear-gradient(135deg, var(--accent-green), #007a41); color: #fff;
       padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 700;
-      white-space: nowrap; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(0, 168, 89, 0.4);
+      white-space: nowrap; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 168, 89, 0.4);
     }
-    .ad-btn:hover { box-shadow: 0 0 20px rgba(0, 230, 118, 0.8); transform: scale(1.05); }
+    .ad-btn:hover { box-shadow: 0 6px 25px rgba(0, 230, 118, 0.8); transform: translateY(-2px) scale(1.05); }
 
     .typewriter-box {
       margin-top: 14px; padding-top: 10px; border-top: 1px dashed rgba(255, 255, 255, 0.1);
@@ -183,28 +103,86 @@
     .cursor { display: inline-block; width: 7px; height: 15px; background-color: var(--accent-green-bright); margin-left: 2px; animation: blink 0.7s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-    #player-section { margin-bottom: 24px; background: var(--card-bg); border-radius: 8px; padding: 16px; border: 1px solid var(--border); display: none; }
-    .player-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
+    /* GAME DETAILS / PLAYER SECTION */
+    #player-section { 
+      margin-bottom: 24px; 
+      background: var(--card-bg); 
+      border-radius: 12px; 
+      padding: 20px; 
+      border: 1px solid var(--border); 
+      display: none; 
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6); 
+      transform-style: preserve-3d;
+      transform: translateZ(35px);
+    }
+    .player-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 12px; flex-wrap: wrap; }
+    .game-detailed-info { font-size: 0.9rem; color: var(--accent-blue); display: flex; gap: 16px; font-weight: 600; margin-top: 4px; }
     .player-actions { display: flex; gap: 8px; }
-    .player-actions button { width: auto; padding: 8px 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; }
+    .player-actions button { width: auto; padding: 8px 14px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; }
     button.secondary { background: #161b22; border: 1px solid var(--border); }
     button.danger { background: #d73a49; }
-    iframe { width: 100%; height: 75vh; border: none; border-radius: 6px; background: #000; }
+    iframe { width: 100%; height: 70vh; border: none; border-radius: 8px; background: #000; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
 
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; position: transform-style: preserve-3d; }
-    .card:hover { transform: translateY(-5px) scale(1.02); border-color: var(--accent-blue); box-shadow: 0 10px 25px rgba(0, 240, 255, 0.25); }
-    .card-img-wrapper { width: 100%; height: 140px; background: #000; overflow: hidden; }
-    .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-    .card:hover .card-img-wrapper img { transform: scale(1.1); }
-    .card-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; justify-content: space-between; }
-    .title { font-size: 0.95rem; font-weight: 600; color: var(--text); }
-    .plays { font-size: 0.8rem; color: var(--text-muted); }
-    .play-btn { width: 100%; padding: 8px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--primary); color: #fff; transition: opacity 0.2s; }
-    .play-btn:hover { opacity: 0.9; }
+    /* 3D CARDS GRID & HOVER EFFECTS */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 18px; transform-style: preserve-3d; }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 14px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transform-style: preserve-3d;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-10px) scale(1.04) rotateX(4deg) translateZ(20px);
+      border-color: var(--accent-blue);
+      box-shadow: 0 20px 40px rgba(0, 240, 255, 0.3);
+    }
+
+    .icon {
+      font-size: 2.8rem;
+      transition: transform 0.3s ease;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .card:hover .icon {
+      transform: scale(1.2) translateZ(25px);
+    }
+
+    .title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .plays { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2px; }
+    .playtime { font-size: 0.75rem; color: var(--accent-blue); }
+    
+    .play-btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--primary), #cc2e2e);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(255, 75, 75, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .play-btn:hover {
+      transform: translateY(-2px) translateZ(10px);
+      box-shadow: 0 6px 18px rgba(255, 75, 75, 0.6);
+    }
 
     @media (max-width: 600px) {
       .header { flex-direction: column; align-items: flex-start; }
+      .metrics-container { width: 100%; justify-content: space-between; }
       .ad-top-row { flex-direction: column; align-items: flex-start; padding-top: 14px; }
       .ad-btn { width: 100%; text-align: center; }
       iframe { height: 60vh; }
@@ -213,35 +191,26 @@
 </head>
 <body>
 
-  <section id="home-section">
-    <div class="hero-title">WELCOME TO PLAYHUB</div>
-    <div class="hero-subtitle">Experience next-gen 3D browser gaming. Explore our interactive portal below.</div>
-
-    <div class="hero-carousel" id="hero-carousel"></div>
-
-    <button class="explore-btn" onclick="enterPortal()">
-      <span>Enter Portal</span> ➔
-    </button>
-  </section>
-
+  <!-- MAIN GAMES PORTAL -->
   <main id="main">
     <div class="header">
       <div>
         <h1>🎮 PlayHub Games</h1>
-        <p style="color: var(--text-muted);">Leaderboard sorted by top performance & engagement.</p>
+        <p style="color: var(--text-muted);">Select any game to view detailed statistics and launch the 3D player.</p>
       </div>
-      <div class="metrics-group">
+      <div class="metrics-container">
         <div class="metric-box">
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Total Plays</div>
-          <div class="metric-value" id="total-plays-metric">1,072</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Total Playtime</div>
+          <div class="metric-value time" id="total-time">24h 15m</div>
         </div>
         <div class="metric-box">
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Total Play Time</div>
-          <div class="metric-value" id="total-time-metric" style="color: var(--accent-blue);">24h 15m</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Total Plays</div>
+          <div class="metric-value" id="total-count">1,072</div>
         </div>
       </div>
     </div>
 
+    <!-- PROMOTIONAL AD FOR CREATEFORME -->
     <div class="ad-container">
       <span class="ad-badge">Sponsored</span>
       <div class="ad-top-row">
@@ -261,9 +230,15 @@
       </div>
     </div>
 
+    <!-- SELECTED GAME DETAILS & PLAYER SECTION -->
     <section id="player-section">
       <div class="player-header">
-        <h3 id="player-name">Playing</h3>
+        <div>
+          <h3 id="player-name" style="font-size: 1.3rem;">Playing</h3>
+          <div class="game-detailed-info" id="game-detailed-info">
+            <!-- Dynamic Details Inserted Here -->
+          </div>
+        </div>
         <div class="player-actions">
           <button class="secondary" onclick="openTab()">⤢ Full Tab</button>
           <button class="danger" onclick="closePlayer()">✕ Close</button>
@@ -277,58 +252,31 @@
       </iframe>
     </section>
 
+    <!-- GAMES GRID -->
     <div class="grid" id="grid"></div>
   </main>
 
   <script>
-    // EXACT ORIGINAL GAMES LIST IN ORDER, DISTRIBUTED EXACTLY ACCORDING TO LEADERBOARD RANKINGS TO TOTAL 1072 PLAYS & 24H 15M TIME
+    // GAMES DATA WITH INDIVIDUAL PLAYS AND PLAYTIME ASSIGNMENTS
     const INITIAL_GAMES = [
-      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "img": "ChatGPT Image Sep 4, 2026 at 08_50_26 PM.png", "plays": 185, "time": "4h 10m"},
-      {"id": "game_stell_titans", "title": "Steel Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "img": "ChatGPT Image Sep 4, 2026 at 08_57_57 PM.png", "plays": 150, "time": "3h 30m"},
-      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "img": "ChatGPT Image Sep 4, 2026 at 08_59_26 PM.png", "plays": 135, "time": "3h 00m"},
-      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "img": "ChatGPT Image Sep 4, 2026 at 09_00_45 PM.png", "plays": 120, "time": "2h 45m"},
-      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "img": "Cybernetic_figure_riding_hoverboard_202609042112.jpeg", "plays": 105, "time": "2h 20m"},
-      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "img": "Gemini_Generated_Image_7jhz467jhz467jhz.png", "plays": 90, "time": "2h 00m"},
-      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "img": "Gemini_Generated_Image_t2d3xqt2d3xqt2d3.png", "plays": 80, "time": "1h 45m"},
-      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "img": "Gemini_Generated_Image_6u3f8w6u3f8w6u3f.png", "plays": 65, "time": "1h 15m"},
-      {"id": "game_solar_man", "title": "Solar Man", "url": "https://ritugnsolarman.netlify.app/", "img": "Gemini_Generated_Image_4pasvu4pasvu4pas.png", "plays": 50, "time": "1h 00m"},
-      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "img": "Gemini_Generated_Image_2u41b52u41b52u41.png", "plays": 55, "time": "45m"},
-      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "img": "Gemini_Generated_Image_4tgkgm4tgkgm4tgk.png", "plays": 37, "time": "30m"}
+      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "icon": "♟️", "plays": 185, "time": "4h 20m"},
+      {"id": "game_stell_titans", "title": "Steel Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "icon": "🤖", "plays": 150, "time": "3h 45m"},
+      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "icon": "🚀", "plays": 135, "time": "3h 10m"},
+      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "icon": "💥", "plays": 120, "time": "2h 50m"},
+      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "icon": "🏄", "plays": 105, "time": "2h 15m"},
+      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "icon": "🏓", "plays": 90, "time": "1h 50m"},
+      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "icon": "⚡", "plays": 80, "time": "1h 35m"},
+      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "icon": "🪐", "plays": 65, "time": "1h 10m"},
+      {"id": "game_solar_man", "title": "Solar Man", "url": "https://ritugnsolarman.netlify.app/", "icon": "☀️", "plays": 50, "time": "55m"},
+      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "icon": "🖐️", "plays": 55, "time": "1h 05m"},
+      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "icon": "⚔️", "plays": 37, "time": "40m"}
     ];
 
-    const STORAGE_KEY = "playhub_games_home_v1";
+    const STORAGE_KEY = "playhub_games_direct_3d";
     let games = JSON.parse(localStorage.getItem(STORAGE_KEY)) || INITIAL_GAMES;
     let activeUrl = "";
 
-    // SETUP 3D ROTATING CAROUSEL WITH ORIGINAL IMAGES
-    function initHeroCarousel() {
-      const carousel = document.getElementById("hero-carousel");
-      carousel.innerHTML = "";
-      const totalItems = games.length;
-      const radius = 220;
-
-      games.forEach((g, i) => {
-        const theta = (i / totalItems) * 2 * Math.PI;
-        const item = document.createElement("div");
-        item.className = "carousel-item";
-        item.style.transform = `rotateY(${i * (360 / totalItems)}deg) translateZ(${radius}px)`;
-        
-        const img = document.createElement("img");
-        img.src = g.img;
-        img.alt = g.title;
-        item.appendChild(img);
-        carousel.appendChild(item);
-      });
-    }
-
-    function enterPortal() {
-      document.getElementById("home-section").style.display = "none";
-      const main = document.getElementById("main");
-      main.style.display = "block";
-      main.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // TYPEWRITER ANIMATION FOR CREATEFORME
+    // TYPEWRITER ANIMATION FOR AD
     const services = [
       "Custom Interactive Web Applications...",
       "AI Image & Video Generation...",
@@ -367,21 +315,19 @@
     }
 
     function render() {
-      document.getElementById("total-plays-metric").innerText = "1,072";
-      document.getElementById("total-time-metric").innerText = "24h 15m";
+      games.sort((a, b) => (parseInt(b.plays) || 0) - (parseInt(a.plays) || 0));
+      document.getElementById("total-count").innerText = "1,072";
+      document.getElementById("total-time").innerText = "24h 15m";
 
       document.getElementById("grid").innerHTML = games.map(g => `
-        <div class="card">
-          <div class="card-img-wrapper">
-            <img src="${g.img}" alt="${g.title}" />
+        <div class="card" onclick="play('${g.id}')">
+          <div>
+            <div class="icon">${g.icon}</div>
+            <div class="title">${g.title}</div>
+            <div class="plays">${(parseInt(g.plays) || 0).toLocaleString()} plays</div>
+            <div class="playtime">⏱️ Play Time: ${g.time}</div>
           </div>
-          <div class="card-body">
-            <div>
-              <div class="title">${g.title}</div>
-              <div class="plays">${(parseInt(g.plays) || 0).toLocaleString()} plays • ⏱️ ${g.time}</div>
-            </div>
-            <button class="play-btn" onclick="play('${g.id}')">▶ Play</button>
-          </div>
+          <button class="play-btn" onclick="event.stopPropagation(); play('${g.id}')">▶ Play Game</button>
         </div>
       `).join('');
     }
@@ -401,13 +347,19 @@
       const g = games.find(x => x.id === id);
       if (!g) return;
 
-      if (id === 'game_hand_gesture_slicer' || g.title.toLowerCase().includes('gesture')) {
+      if (id === 'game_hand_gesture_slicer' || g.title.toLowerCase().includes('gesture') || g.title.toLowerCase().includes('camera')) {
         await ensureCameraPermission();
       }
 
       g.plays = (parseInt(g.plays) || 0) + 1;
       activeUrl = g.url;
-      document.getElementById("player-name").innerText = `Playing: ${g.title}`;
+      
+      document.getElementById("player-name").innerText = `Playing: ${g.icon} ${g.title}`;
+      document.getElementById("game-detailed-info").innerHTML = `
+        <span>📊 Total Plays: ${(parseInt(g.plays) || 0).toLocaleString()}</span>
+        <span>⏱️ Session Play Time: ${g.time}</span>
+      `;
+      
       document.getElementById("game-frame").src = g.url;
       document.getElementById("player-section").style.display = "block";
       document.getElementById("player-section").scrollIntoView({ behavior: 'smooth' });
@@ -423,7 +375,6 @@
       if (activeUrl) window.open(activeUrl, "_blank");
     }
 
-    initHeroCarousel();
     render();
   </script>
 </body>
