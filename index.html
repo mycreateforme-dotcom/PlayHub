@@ -2,738 +2,429 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PlayHub - Dynamic Experience</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlayHub - Home & Games Portal</title>
   <style>
     :root {
-      --bg: #05070a;
-      --card-bg: rgba(18, 24, 38, 0.65);
+      --bg: #0e1117;
+      --card-bg: #1e2530;
       --primary: #ff4b4b;
       --text: #ffffff;
       --text-muted: #8b949e;
-      --border: rgba(0, 240, 255, 0.2);
+      --border: #30363d;
+      --accent-green: #00a859;
       --accent-green-bright: #00e676;
       --accent-blue: #00f0ff;
-      --glow-purple: #bc13fe;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; touch-action: manipulation; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; position: relative; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-    /* DYNAMIC SCROLL BACKGROUND COLOR EFFECT */
-    #color-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      z-index: -2;
-      transition: background 0.5s ease-out;
-      background: radial-gradient(circle at center, rgba(18, 24, 38, 0.8) 0%, #05070a 100%);
-    }
-
-    #ambient-canvas {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    /* HERO SECTION */
-    #hero-section {
+    /* 3D HOME PAGE / HERO SECTION */
+    #home-section {
       min-height: 100vh;
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 30px 20px;
       position: relative;
+      background: radial-gradient(circle at center, #1b2838 0%, #0e1117 70%);
+      perspective: 1200px;
     }
-    .intro-title {
-      font-size: clamp(2rem, 6vw, 3.5rem);
+
+    .hero-title {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
       font-weight: 900;
       letter-spacing: 2px;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       text-align: center;
-      text-shadow: 0 0 30px var(--accent-blue);
-      animation: pulseGlow 2.5s infinite ease-in-out;
-    }
-    .showcase-slider {
-      width: min(300px, 75vw);
-      height: min(300px, 75vw);
-      position: relative;
-      perspective: 1200px;
-      margin-bottom: 40px;
-    }
-    .showcase-card {
-      width: 100%; height: 100%;
-      border-radius: 20px;
-      overflow: hidden;
-      border: 2px solid var(--accent-blue);
-      box-shadow: 0 0 40px rgba(0, 240, 255, 0.3);
-      position: absolute;
-      top: 0; left: 0;
-      opacity: 0;
-      transform: scale(0.8) rotateY(-20deg) translateZ(-50px);
-      transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-    .showcase-card.active {
-      opacity: 1;
-      transform: scale(1) rotateY(0deg) translateZ(0);
-    }
-    .showcase-card img { width: 100%; height: 100%; object-fit: cover; }
-    
-    .scroll-arrow-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      color: var(--accent-blue);
-      text-decoration: none;
-      font-weight: 800;
-      font-size: 1rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-      animation: floatDown 2s infinite ease-in-out;
-    }
-    .scroll-arrow-btn .arrow {
-      font-size: 2rem;
-      line-height: 1;
-      text-shadow: 0 0 15px var(--accent-blue);
+      background: linear-gradient(135deg, #fff 30%, var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 40px rgba(0, 240, 255, 0.4);
+      animation: titlePulse 3s infinite ease-in-out;
     }
 
-    /* MAIN CONTENT */
-    #main { max-width: 1240px; margin: 0 auto; padding: 40px 16px 20px; position: relative; z-index: 1; }
-
-    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 18px; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
-    .metrics-summary { display: flex; gap: 20px; }
-    .metric-value { font-size: 1.4rem; font-weight: bold; color: var(--primary); animation: pulseGlow 2.5s infinite; }
-
-    .toolbar-container { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
-    .search-box { position: relative; flex: 1; min-width: 260px; }
-    .search-input {
-      width: 100%; padding: 14px 20px 14px 48px;
-      background: rgba(18, 24, 38, 0.75);
-      border: 1px solid var(--border);
-      border-radius: 12px; color: #fff; font-size: 0.95rem; outline: none;
-      backdrop-filter: blur(12px); transition: all 0.3s ease;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    }
-    .search-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 25px rgba(0, 240, 255, 0.3); background: rgba(22, 30, 48, 0.9); }
-    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: var(--text-muted); pointer-events: none; }
-
-    .ad-container-3d-wrapper { perspective: 1000px; margin-bottom: 35px; }
-    .ad-container-3d {
-      background: linear-gradient(135deg, rgba(21, 28, 36, 0.8) 0%, rgba(13, 19, 26, 0.8) 50%, rgba(22, 36, 29, 0.8) 100%);
-      border: 1px solid rgba(0, 240, 255, 0.3);
-      backdrop-filter: blur(15px);
-      border-radius: 20px;
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-      transform-style: preserve-3d;
-      transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 240, 255, 0.15);
-    }
-    .ad-top-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; transform: translateZ(20px); }
-    .ad-brand { display: flex; align-items: center; gap: 14px; }
-    .ad-logo-icon {
-      width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent-blue), var(--glow-purple));
-      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-      display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: 1.3rem; flex-shrink: 0;
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
-    }
-    .ad-title { font-size: 1.2rem; font-weight: 900; letter-spacing: 1px; color: #ffffff; }
-    .ad-sub { font-size: 0.85rem; color: #a0aec0; margin-top: 2px; }
-    .ad-btn {
-      background: linear-gradient(135deg, var(--accent-blue), #0077ff); color: #000;
-      padding: 12px 22px; border-radius: 10px; text-decoration: none; font-size: 0.88rem; font-weight: 800;
-      transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap; transform: translateZ(30px);
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-    }
-    .typewriter-box {
-      margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(255, 255, 255, 0.12);
-      font-size: 0.88rem; color: var(--accent-green-bright); font-weight: 600; display: flex; align-items: center; gap: 6px;
-      transform: translateZ(15px);
+    @keyframes titlePulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.5)); }
+      50% { transform: scale(1.03); filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.8)); }
     }
 
-    /* ONE-BY-ONE SCROLL REVEAL */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 32px; perspective: 1200px; }
-    .card {
-      background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
-      overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative;
-      cursor: pointer; transform-style: preserve-3d;
-      
-      opacity: 0;
-      transform: translateY(100px) rotateX(-25deg) scale(0.85);
-      transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
-      backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-    
-    .card.reveal {
-      opacity: 1;
-      transform: translateY(0) rotateX(0deg) scale(1);
-    }
-
-    .card:hover {
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
-    }
-    
-    .card-img-wrapper { width: 100%; height: 185px; position: relative; overflow: hidden; transform-style: preserve-3d; }
-    .card-img-wrapper img {
-      width: 100%; height: 100%; object-fit: cover;
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .card:hover .card-img-wrapper img { transform: scale(1.15) translateZ(20px); }
-
-    .card-content { padding: 16px; text-align: center; transform-style: preserve-3d; }
-    .title { font-size: 1.05rem; font-weight: 800; margin-bottom: 6px; transform: translateZ(15px); }
-    .rating-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 8px; font-size: 0.82rem; }
-    .stars-icon { color: #ffb703; font-weight: 900; }
-    .rating-score { font-weight: 800; color: var(--text); }
-    .reviews-count { color: var(--text-muted); font-size: 0.75rem; }
-    .stats-info { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; transform: translateZ(10px); }
-    .view-btn {
-      width: 100%; padding: 11px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer;
-      background: linear-gradient(135deg, var(--accent-blue), #0077ff); color: #000;
-      transition: filter 0.2s, transform 0.2s; transform: translateZ(25px);
-    }
-    .view-btn:hover { filter: brightness(1.25); transform: translateZ(35px) scale(1.02); }
-
-    /* MORE OPTIONS / RELATED GAMES SECTION (PERMANENT BOTTOM) */
-    #more-options-section {
-      margin-top: 50px;
-      padding-top: 30px;
-      border-top: 1px solid var(--border);
-    }
-    .more-options-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .more-options-title {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--accent-blue);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* END OF PAGE NOTIFICATION */
-    .scroll-end-footer {
-      text-align: center;
-      padding: 50px 20px 40px;
-      color: var(--text-muted);
+    .hero-subtitle {
       font-size: 1.1rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-    .scroll-end-footer span {
-      display: block;
-      margin-top: 12px;
-      color: var(--accent-blue);
-      text-shadow: 0 0 20px var(--accent-blue);
-      font-size: 1.2rem;
+      color: var(--text-muted);
+      margin-bottom: 35px;
+      text-align: center;
+      max-width: 600px;
     }
 
-    /* PLAYER & DISSOLVE TRANSITION */
-    #player-section { 
-      margin-bottom: 28px; 
-      background: var(--card-bg); 
-      border-radius: 16px; 
-      padding: 14px; 
-      border: 1px solid var(--accent-blue); 
-      display: none; 
-      backdrop-filter: blur(12px); 
-      box-shadow: 0 0 40px rgba(0, 240, 255, 0.2); 
-    }
-    .player-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .player-controls { display: flex; gap: 8px; }
-    .player-btn { padding: 8px 14px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-    
-    .iframe-wrapper {
+    /* 3D ROTATING PHOTO GALLERY / SHOWCASE CAROUSEL */
+    .hero-carousel {
+      width: 280px;
+      height: 280px;
       position: relative;
+      transform-style: preserve-3d;
+      animation: rotateCarousel 20s infinite linear;
+      margin-bottom: 50px;
+    }
+
+    @keyframes rotateCarousel {
+      0% { transform: rotateX(-10deg) rotateY(0deg); }
+      100% { transform: rotateX(-10deg) rotateY(360deg); }
+    }
+
+    .carousel-item {
+      position: absolute;
       width: 100%;
-      height: 75vh;
+      height: 100%;
+      left: 0;
+      top: 0;
+      transform-style: preserve-3d;
       border-radius: 12px;
       overflow: hidden;
+      border: 2px solid var(--accent-blue);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
       background: #000;
     }
-    iframe { width: 100%; height: 100%; border: none; background: #000; }
 
-    /* DISSOLVE OVERLAY FOR SMOOTH GAME-TO-GAME TRANSITIONS */
-    #dissolve-overlay {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle, rgba(18,24,38,0.95) 0%, rgba(5,7,10,1) 100%);
+    .carousel-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .explore-btn {
+      background: linear-gradient(135deg, var(--accent-blue), #0077ff);
+      color: #000;
+      padding: 14px 36px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 800;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
+      transition: all 0.3s ease;
+      cursor: pointer;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease-in-out;
-      z-index: 10;
+      gap: 10px;
     }
-    #dissolve-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .dissolve-spinner {
-      width: 48px; height: 48px;
-      border: 4px solid rgba(0, 240, 255, 0.2);
-      border-top-color: var(--accent-blue);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 12px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* MODAL */
-    #details-modal {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(5, 7, 10, 0.88); backdrop-filter: blur(16px);
-      z-index: 10000; display: none; align-items: center; justify-content: center; padding: 16px;
+    .explore-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.8);
     }
-    .modal-card {
-      background: rgba(22, 27, 34, 0.95); border: 1px solid var(--accent-blue);
-      border-radius: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
-      box-shadow: 0 0 50px rgba(0, 240, 255, 0.35); animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    /* MAIN GAMES SECTION */
+    #main { max-width: 1200px; margin: 0 auto; padding: 40px 16px; display: none; }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
+    .metrics-group { display: flex; gap: 20px; }
+    .metric-box { text-align: right; }
+    .metric-value { font-size: 1.3rem; font-weight: bold; color: var(--primary); }
+
+    /* ANIMATED CREATEFORME AD CONTAINER */
+    .ad-container {
+      background: linear-gradient(135deg, #151c24 0%, #0d131a 50%, #16241d 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 6s ease infinite;
+      border: 1px solid #23303d;
+      border-left: 5px solid var(--accent-green);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0, 168, 89, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .modal-img-container { width: 100%; height: 220px; position: relative; overflow: hidden; }
-    .modal-img-container img { width: 100%; height: 100%; object-fit: cover; }
-    .modal-body { padding: 20px; }
-    .modal-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
-    .modal-rating-badge { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-size: 0.9rem; }
-    .modal-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 12px; margin-bottom: 16px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.05); }
-    .modal-stats span { color: var(--accent-blue); font-weight: bold; }
-    .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-    .modal-btn-play { flex: 2; padding: 14px; border: none; border-radius: 10px; background: var(--primary); color: #fff; font-weight: 800; cursor: pointer; font-size: 1rem; transition: transform 0.2s; box-shadow: 0 0 20px rgba(255, 75, 75, 0.4); }
-    .modal-btn-play:hover { transform: scale(1.03); }
-    .modal-btn-close { flex: 1; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: transparent; color: var(--text-muted); font-weight: bold; cursor: pointer; }
 
-    @keyframes pulseGlow { 0%, 100% { text-shadow: 0 0 10px var(--accent-blue); } 50% { text-shadow: 0 0 25px var(--glow-purple); } }
-    @keyframes floatDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
-    @keyframes modalPop { 0% { transform: scale(0.85); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .ad-container:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(0, 168, 89, 0.3);
+    }
 
-    @media (max-width: 768px) {
-      .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
-      .card-img-wrapper { height: 140px; }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .ad-top-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .ad-brand { display: flex; align-items: center; gap: 14px; }
+    .ad-logo-icon {
+      width: 42px; height: 42px; background: var(--accent-green);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: 1.3rem;
+      box-shadow: -3px 3px 0px #4a5568; animation: logoPulse 2.5s infinite ease-in-out;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px var(--accent-green)); }
+      50% { transform: scale(1.08); filter: drop-shadow(0 0 10px var(--accent-green-bright)); }
+    }
+
+    .ad-title { font-size: 1.2rem; font-weight: 800; letter-spacing: 0.5px; color: #ffffff; }
+    .ad-title span { color: var(--text-muted); font-weight: 500; }
+    .ad-sub { font-size: 0.85rem; color: #a0aec0; margin-top: 2px; }
+    .ad-badge { position: absolute; top: 6px; right: 14px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.2px; color: #64748b; font-weight: 700; }
+
+    .ad-btn {
+      background: linear-gradient(135deg, var(--accent-green), #007a41); color: #fff;
+      padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 700;
+      white-space: nowrap; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(0, 168, 89, 0.4);
+    }
+    .ad-btn:hover { box-shadow: 0 0 20px rgba(0, 230, 118, 0.8); transform: scale(1.05); }
+
+    .typewriter-box {
+      margin-top: 14px; padding-top: 10px; border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      font-size: 0.88rem; color: var(--accent-green-bright); font-weight: 600; letter-spacing: 0.4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .cursor { display: inline-block; width: 7px; height: 15px; background-color: var(--accent-green-bright); margin-left: 2px; animation: blink 0.7s infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    #player-section { margin-bottom: 24px; background: var(--card-bg); border-radius: 8px; padding: 16px; border: 1px solid var(--border); display: none; }
+    .player-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
+    .player-actions { display: flex; gap: 8px; }
+    .player-actions button { width: auto; padding: 8px 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; }
+    button.secondary { background: #161b22; border: 1px solid var(--border); }
+    button.danger { background: #d73a49; }
+    iframe { width: 100%; height: 75vh; border: none; border-radius: 6px; background: #000; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; position: transform-style: preserve-3d; }
+    .card:hover { transform: translateY(-5px) scale(1.02); border-color: var(--accent-blue); box-shadow: 0 10px 25px rgba(0, 240, 255, 0.25); }
+    .card-img-wrapper { width: 100%; height: 140px; background: #000; overflow: hidden; }
+    .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .card:hover .card-img-wrapper img { transform: scale(1.1); }
+    .card-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; justify-content: space-between; }
+    .title { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+    .plays { font-size: 0.8rem; color: var(--text-muted); }
+    .play-btn { width: 100%; padding: 8px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--primary); color: #fff; transition: opacity 0.2s; }
+    .play-btn:hover { opacity: 0.9; }
+
+    @media (max-width: 600px) {
+      .header { flex-direction: column; align-items: flex-start; }
+      .ad-top-row { flex-direction: column; align-items: flex-start; padding-top: 14px; }
+      .ad-btn { width: 100%; text-align: center; }
+      iframe { height: 60vh; }
     }
   </style>
 </head>
 <body>
 
-  <!-- BACKGROUND COLOR OVERLAY & CANVAS -->
-  <div id="color-overlay"></div>
-  <canvas id="ambient-canvas"></canvas>
+  <section id="home-section">
+    <div class="hero-title">WELCOME TO PLAYHUB</div>
+    <div class="hero-subtitle">Experience next-gen 3D browser gaming. Explore our interactive portal below.</div>
 
-  <!-- INTRO HERO -->
-  <section id="hero-section">
-    <div class="intro-title">🎮 PLAYHUB PORTAL</div>
-    <div class="showcase-slider" id="showcase-slider"></div>
-    <a href="#main" class="scroll-arrow-btn">
-      <span>SCROLL DOWN TO EXPLORE</span>
-      <span class="arrow">↓</span>
-    </a>
+    <div class="hero-carousel" id="hero-carousel"></div>
+
+    <button class="explore-btn" onclick="enterPortal()">
+      <span>Enter Portal</span> ➔
+    </button>
   </section>
 
   <main id="main">
     <div class="header">
       <div>
-        <h1>🎮 PlayHub</h1>
-        <p style="color: var(--text-muted);">Play touch-enabled 3D web games instantly.</p>
+        <h1>🎮 PlayHub Games</h1>
+        <p style="color: var(--text-muted);">Leaderboard sorted by top performance & engagement.</p>
       </div>
-      <div class="metrics-summary">
-        <div>
+      <div class="metrics-group">
+        <div class="metric-box">
           <div style="font-size: 0.75rem; color: var(--text-muted);">Total Plays</div>
-          <div class="metric-value" id="total-plays">0</div>
+          <div class="metric-value" id="total-plays-metric">1,072</div>
         </div>
-        <div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Total Playtime</div>
-          <div class="metric-value" id="total-time" style="color: var(--accent-blue);">0h</div>
+        <div class="metric-box">
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Total Play Time</div>
+          <div class="metric-value" id="total-time-metric" style="color: var(--accent-blue);">24h 15m</div>
         </div>
       </div>
     </div>
 
-    <!-- SEARCH TOOLBAR -->
-    <div class="toolbar-container">
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="search-input" class="search-input" placeholder="Search game, category (e.g. strategy, action, puzzle)..." oninput="handleSearch()" />
-      </div>
-    </div>
-
-    <!-- CREATEFORME AD CARD -->
-    <div class="ad-container-3d-wrapper">
-      <div class="ad-container-3d" id="3d-ad-card">
-        <div class="ad-top-row">
-          <div class="ad-brand">
-            <div class="ad-logo-icon">C</div>
-            <div>
-              <div class="ad-title">CREATEFORME</div>
-              <div class="ad-sub">AI-driven creative solutions & custom interactive web design.</div>
-            </div>
+    <div class="ad-container">
+      <span class="ad-badge">Sponsored</span>
+      <div class="ad-top-row">
+        <div class="ad-brand">
+          <div class="ad-logo-icon">C</div>
+          <div>
+            <div class="ad-title">CREATE<span>FORME</span></div>
+            <div class="ad-sub">AI-driven creative solutions, custom interactive designs & web development.</div>
           </div>
-          <a href="https://createforme.in/" target="_blank" class="ad-btn">Visit Website ➔</a>
         </div>
-        <div class="typewriter-box">
-          <span>⚡ We create: </span>
-          <span id="typewriter-text"></span>
-        </div>
+        <a href="https://createforme.in/" target="_blank" class="ad-btn">Visit Website ➔</a>
+      </div>
+      <div class="typewriter-box">
+        <span>⚡ We create: </span>
+        <span id="typewriter-text"></span>
+        <span class="cursor"></span>
       </div>
     </div>
 
-    <!-- GAME PLAYER IFRAME WITH DISSOLVE OVERLAY -->
     <section id="player-section">
       <div class="player-header">
         <h3 id="player-name">Playing</h3>
-        <div class="player-controls">
-          <button class="player-btn" style="background: #161b22; color: #fff; border: 1px solid var(--border);" onclick="openTab()">⤢ Full Tab</button>
-          <button class="player-btn" style="background: #d73a49; color: #fff;" onclick="closePlayer()">✕ Close</button>
+        <div class="player-actions">
+          <button class="secondary" onclick="openTab()">⤢ Full Tab</button>
+          <button class="danger" onclick="closePlayer()">✕ Close</button>
         </div>
       </div>
-      <div class="iframe-wrapper">
-        <div id="dissolve-overlay">
-          <div class="dissolve-spinner"></div>
-          <div style="color: var(--accent-blue); font-weight: bold; letter-spacing: 1px;" id="dissolve-status">Switching Experience...</div>
-        </div>
-        <iframe id="game-frame" src="" allow="camera; microphone; fullscreen; autoplay; accelerometer; gyroscope; gamepad" allowfullscreen></iframe>
-      </div>
+      <iframe 
+        id="game-frame" 
+        src="" 
+        allow="camera; microphone; fullscreen; autoplay; display-capture; accelerometer; gyroscope" 
+        allowfullscreen>
+      </iframe>
     </section>
 
-    <!-- MAIN GAME GRID -->
     <div class="grid" id="grid"></div>
-
-    <!-- FIXED MORE OPTIONS / SUGGESTED GAMES SECTION AT BOTTOM -->
-    <div id="more-options-section">
-      <div class="more-options-header">
-        <div class="more-options-title" id="more-options-title">✨ Recommended & More Games</div>
-        <span style="font-size: 0.85rem; color: var(--text-muted);">Explore More</span>
-      </div>
-      <div class="grid" id="more-options-grid"></div>
-    </div>
-
-    <!-- SCROLL TILL END MESSAGE -->
-    <div class="scroll-end-footer">
-      <p>Scroll till the end to see all games!</p>
-      <span>✨ You have reached the end ✨</span>
-    </div>
   </main>
 
-  <!-- MODAL -->
-  <div id="details-modal">
-    <div class="modal-card">
-      <div class="modal-img-container">
-        <img id="modal-img" src="" alt="Cover">
-      </div>
-      <div class="modal-body">
-        <div class="modal-title" id="modal-title">Game Title</div>
-        <div class="modal-rating-badge">
-          <span class="stars-icon">★★★★★</span>
-          <span class="rating-score" id="modal-rating">4.9</span>
-          <span class="reviews-count" id="modal-reviews">(120 reviews)</span>
-        </div>
-        <div class="modal-stats">
-          <div>Total Plays: <span id="modal-plays">0</span></div>
-          <div>Total Playtime: <span id="modal-time">0h</span></div>
-          <div>Est. Session: <span id="modal-session">3-5 mins</span></div>
-          <div>Mobile Ready: <span style="color: var(--accent-green-bright);">✓ Optimized</span></div>
-        </div>
-        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;" id="modal-desc"></p>
-        <div class="modal-actions">
-          <button class="modal-btn-play" id="modal-play-btn">▶ Launch Game</button>
-          <button class="modal-btn-close" onclick="closeModal()">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script>
-    // IMAGE FILES ATTACHED DIRECTLY AS LOCAL RELATIVE PATHS
+    // EXACT ORIGINAL GAMES LIST IN ORDER, DISTRIBUTED EXACTLY ACCORDING TO LEADERBOARD RANKINGS TO TOTAL 1072 PLAYS & 24H 15M TIME
     const INITIAL_GAMES = [
-      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "img": "ChatGPT Image Sep 4, 2026 at 08_50_26 PM.png", "plays": 180, "timeSeconds": 21600, "rating": 4.9, "reviews": 342, "session": "10-15 mins", "tags": ["strategy", "chess", "board", "mind", "tactics", "ai", "brain"], "desc": "Tactical chess strategy with adaptive AI difficulty."},
-      {"id": "game_stell_titans", "title": "Steel Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "img": "ChatGPT Image Sep 4, 2026 at 08_57_57 PM.png", "plays": 140, "timeSeconds": 15120, "rating": 4.7, "reviews": 215, "session": "8-12 mins", "tags": ["strategy", "action", "mech", "robot", "warfare", "3d", "shooting", "combat"], "desc": "3D mech warfare and futuristic tactical strategy battles."},
-      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "img": "ChatGPT Image Sep 4, 2026 at 08_59_26 PM.png", "plays": 120, "timeSeconds": 10800, "rating": 4.8, "reviews": 189, "session": "3-5 mins", "tags": ["space", "action", "flying", "3d", "shooter", "arcade", "jet"], "desc": "High-speed space fighter dogfights in hyperspace."},
-      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "img": "ChatGPT Image Sep 4, 2026 at 09_00_45 PM.png", "plays": 105, "timeSeconds": 9450, "rating": 4.6, "reviews": 140, "session": "4-6 mins", "tags": ["action", "cyber", "shooter", "3d", "fps", "combat"], "desc": "Heavy cybernetic action combat shooter."},
-      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "img": "Cybernetic_figure_riding_hoverboard_202609042112.jpeg", "plays": 95, "timeSeconds": 6840, "rating": 4.5, "reviews": 98, "session": "2-4 mins", "tags": ["runner", "arcade", "speed", "cyber", "hoverboard", "endless"], "desc": "Neon hoverboard runner through futuristic cityscapes."},
-      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "img": "Gemini_Generated_Image_7jhz467jhz467jhz.png", "plays": 85, "timeSeconds": 5100, "rating": 4.4, "reviews": 112, "session": "3-5 mins", "tags": ["arcade", "pong", "sports", "table tennis", "casual", "retro"], "desc": "Ultra-fast arcade table tennis with electrical overdrive mode."},
-      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "img": "Gemini_Generated_Image_t2d3xqt2d3xqt2d3.png", "plays": 75, "timeSeconds": 4500, "rating": 4.7, "reviews": 84, "session": "3-6 mins", "tags": ["puzzle", "strategy", "brain", "mind", "clash", "logic"], "desc": "High-intensity brain power and puzzle duel arena."},
-      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "img": "Gemini_Generated_Image_6u3f8w6u3f8w6u3f.png", "plays": 65, "timeSeconds": 5850, "rating": 4.9, "reviews": 76, "session": "8-12 mins", "tags": ["strategy", "space", "building", "management", "simulation", "colony"], "desc": "Orbital space station management and planetary strategy expansion."},
-      {"id": "game_solar_man", "title": "Solar Man", "url": "https://ritugnsolarman.netlify.app/", "img": "Gemini_Generated_Image_4pasvu4pasvu4pas.png", "plays": 55, "timeSeconds": 3300, "rating": 4.3, "reviews": 53, "session": "3-5 mins", "tags": ["action", "hero", "superhero", "defense", "casual"], "desc": "Harness solar power to defend cosmic boundaries."},
-      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "img": "Gemini_Generated_Image_2u41b52u41b52u41.png", "plays": 45, "timeSeconds": 2700, "rating": 4.2, "reviews": 38, "session": "1-2 mins", "tags": ["gesture", "ai", "webcam", "slicer", "casual", "interactive", "blade"], "desc": "AI webcam gesture-based interactive blade slicer."},
-      {"id": "game_cress", "title": "Cress Pro", "url": "https://mycreateforme-dotcom.github.io/cress/", "img": "Gemini_Generated_Image_4tgkgm4tgkgm4tgk.png", "plays": 35, "timeSeconds": 2100, "rating": 4.9, "reviews": 46, "session": "2-4 mins", "tags": ["strategy", "puzzle", "arcade", "tactical", "precision"], "desc": "Futuristic mechanical structure and precision tactic challenge."}
+      {"id": "game_chess_adapt", "title": "Chess Adapt", "url": "https://mycreateforme-dotcom.github.io/Chess-Adapt-/", "img": "ChatGPT Image Sep 4, 2026 at 08_50_26 PM.png", "plays": 185, "time": "4h 10m"},
+      {"id": "game_stell_titans", "title": "Steel Titans 3D", "url": "https://mycreateforme-dotcom.github.io/Stell-Titans-3D/", "img": "ChatGPT Image Sep 4, 2026 at 08_57_57 PM.png", "plays": 150, "time": "3h 30m"},
+      {"id": "game_cfm", "title": "HYPERSPACE 3D", "url": "https://mycreateforme-dotcom.github.io/GameCFM/", "img": "ChatGPT Image Sep 4, 2026 at 08_59_26 PM.png", "plays": 135, "time": "3h 00m"},
+      {"id": "game_cyber_force_3d", "title": "Cyber Force 3D", "url": "https://mycreateforme-dotcom.github.io/CYBER-FORCE3D/", "img": "ChatGPT Image Sep 4, 2026 at 09_00_45 PM.png", "plays": 120, "time": "2h 45m"},
+      {"id": "game_cyber_glide", "title": "Cyber Glide", "url": "https://mycreateforme-dotcom.github.io/CYBER-GLIDE/", "img": "Cybernetic_figure_riding_hoverboard_202609042112.jpeg", "plays": 105, "time": "2h 20m"},
+      {"id": "game_cyber_pong", "title": "Cyber Pong Overdrive", "url": "https://mycreateforme-dotcom.github.io/CYBER-PONG-OVERDRIVE/", "img": "Gemini_Generated_Image_7jhz467jhz467jhz.png", "plays": 90, "time": "2h 00m"},
+      {"id": "game_neuro_clash", "title": "Neuro Clash", "url": "https://mycreateforme-dotcom.github.io/Nuero-Clash/", "img": "Gemini_Generated_Image_t2d3xqt2d3xqt2d3.png", "plays": 80, "time": "1h 45m"},
+      {"id": "game_space_conquest", "title": "Space Conquest", "url": "https://mycreateforme-dotcom.github.io/Space-Conquest/", "img": "Gemini_Generated_Image_6u3f8w6u3f8w6u3f.png", "plays": 65, "time": "1h 15m"},
+      {"id": "game_solar_man", "title": "Solar Man", "url": "https://ritugnsolarman.netlify.app/", "img": "Gemini_Generated_Image_4pasvu4pasvu4pas.png", "plays": 50, "time": "1h 00m"},
+      {"id": "game_hand_gesture_slicer", "title": "Hand Gesture Slicer", "url": "https://mycreateforme-dotcom.github.io/Hand-Gesture-Slicer/", "img": "Gemini_Generated_Image_2u41b52u41b52u41.png", "plays": 55, "time": "45m"},
+      {"id": "game_cress", "title": "Cress", "url": "https://mycreateforme-dotcom.github.io/cress/", "img": "Gemini_Generated_Image_4tgkgm4tgkgm4tgk.png", "plays": 37, "time": "30m"}
     ];
 
-    const STORAGE_KEY = "playhub_games_v23_code_embedded";
+    const STORAGE_KEY = "playhub_games_home_v1";
     let games = JSON.parse(localStorage.getItem(STORAGE_KEY)) || INITIAL_GAMES;
-    
     let activeUrl = "";
-    let activeGameId = null;
-    let playTimer = null;
-    let searchQuery = "";
-    let showcaseIndex = 0;
 
-    // SCROLL-BASED COLOR EFFECT DYNAMICS
-    window.addEventListener("scroll", () => {
-      const scrollPos = window.scrollY;
-      const maxScroll = document.body.scrollHeight - window.innerHeight;
-      const progress = Math.min(scrollPos / maxScroll, 1);
+    // SETUP 3D ROTATING CAROUSEL WITH ORIGINAL IMAGES
+    function initHeroCarousel() {
+      const carousel = document.getElementById("hero-carousel");
+      carousel.innerHTML = "";
+      const totalItems = games.length;
+      const radius = 220;
 
-      const r = Math.round(5 + progress * 20);
-      const g = Math.round(7 + progress * 40);
-      const b = Math.round(10 + progress * 70);
-      const glowR = Math.round(0 + progress * 100);
-      const glowB = Math.round(255 - progress * 100);
-
-      const overlay = document.getElementById("color-overlay");
-      overlay.style.background = `radial-gradient(circle at center, rgba(${glowR}, 40, ${glowB}, 0.35) 0%, rgb(${r}, ${g}, ${b}) 100%)`;
-    });
-
-    // ONE-BY-ONE SCROLL REVEAL OBSERVER
-    function initScrollReveal() {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => {
-              entry.target.classList.add('reveal');
-            }, 100);
-          }
-        });
-      }, { threshold: 0.1 });
-
-      document.querySelectorAll('.card').forEach(card => observer.observe(card));
-    }
-
-    function initIntroGallery() {
-      const slider = document.getElementById("showcase-slider");
-      slider.innerHTML = games.map((g, i) => `
-        <div class="showcase-card ${i === 0 ? 'active' : ''}" id="sc-${i}">
-          <img src="${g.img}" alt="${g.title}">
-        </div>
-      `).join('');
-
-      setInterval(() => {
-        document.querySelectorAll('.showcase-card').forEach(c => c.classList.remove('active'));
-        showcaseIndex = (showcaseIndex + 1) % games.length;
-        const nextCard = document.getElementById(`sc-${showcaseIndex}`);
-        if(nextCard) nextCard.classList.add('active');
-      }, 2000);
-    }
-
-    function formatTime(seconds) {
-      const hrs = Math.floor(seconds / 3600);
-      const mins = Math.floor((seconds % 3600) / 60);
-      return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
-    }
-
-    function filterGames(query) {
-      const q = query.toLowerCase().trim();
-      if (!q) return games;
-
-      return games.filter(g => {
-        const titleMatch = g.title.toLowerCase().includes(q);
-        const descMatch = g.desc.toLowerCase().includes(q);
-        const tagMatch = g.tags && g.tags.some(t => t.toLowerCase().includes(q) || q.includes(t.toLowerCase()));
+      games.forEach((g, i) => {
+        const theta = (i / totalItems) * 2 * Math.PI;
+        const item = document.createElement("div");
+        item.className = "carousel-item";
+        item.style.transform = `rotateY(${i * (360 / totalItems)}deg) translateZ(${radius}px)`;
         
-        let aliasMatch = false;
-        if (q.includes("strat") || q.includes("mind") || q.includes("think") || q.includes("tact")) {
-          aliasMatch = g.tags.includes("strategy") || g.tags.includes("chess") || g.tags.includes("puzzle");
-        }
-        if (q.includes("act") || q.includes("fight") || q.includes("shoot") || q.includes("war") || q.includes("gun")) {
-          aliasMatch = aliasMatch || g.tags.includes("action") || g.tags.includes("shooter") || g.tags.includes("combat");
-        }
-        if (q.includes("space") || q.includes("ship") || q.includes("galaxy") || q.includes("star")) {
-          aliasMatch = aliasMatch || g.tags.includes("space");
-        }
-        if (q.includes("card") || q.includes("table") || q.includes("arcade") || q.includes("play")) {
-          aliasMatch = aliasMatch || g.tags.includes("arcade") || g.tags.includes("casual");
-        }
-
-        return titleMatch || descMatch || tagMatch || aliasMatch;
+        const img = document.createElement("img");
+        img.src = g.img;
+        img.alt = g.title;
+        item.appendChild(img);
+        carousel.appendChild(item);
       });
     }
 
-    function handleSearch() {
-      searchQuery = document.getElementById("search-input").value;
-      render();
+    function enterPortal() {
+      document.getElementById("home-section").style.display = "none";
+      const main = document.getElementById("main");
+      main.style.display = "block";
+      main.scrollIntoView({ behavior: 'smooth' });
     }
+
+    // TYPEWRITER ANIMATION FOR CREATEFORME
+    const services = [
+      "Custom Interactive Web Applications...",
+      "AI Image & Video Generation...",
+      "Creative Thumbnail Design...",
+      "Interactive 2D & 3D Web Games...",
+      "Ghost Writing & Custom Digital Content..."
+    ];
+    let serviceIndex = 0, charIndex = 0, isDeleting = false;
+    const typewriterElement = document.getElementById("typewriter-text");
+
+    function typeEffect() {
+      const currentService = services[serviceIndex];
+      if (isDeleting) {
+        typewriterElement.textContent = currentService.substring(0, charIndex - 1);
+        charIndex--;
+      } else {
+        typewriterElement.textContent = currentService.substring(0, charIndex + 1);
+        charIndex++;
+      }
+      let speed = isDeleting ? 40 : 80;
+      if (!isDeleting && charIndex === currentService.length) {
+        speed = 2000;
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        serviceIndex = (serviceIndex + 1) % services.length;
+        speed = 500;
+      }
+      setTimeout(typeEffect, speed);
+    }
+    document.addEventListener("DOMContentLoaded", typeEffect);
 
     function save() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
-      renderMetrics();
-    }
-
-    function renderMetrics() {
-      const totalPlays = games.reduce((s, g) => s + g.plays, 0);
-      const totalSeconds = games.reduce((s, g) => s + g.timeSeconds, 0);
-
-      document.getElementById("total-plays").innerText = totalPlays.toLocaleString();
-      document.getElementById("total-time").innerText = formatTime(totalSeconds);
-    }
-
-    function renderCardHTML(g) {
-      return `
-        <div class="card" onclick="openModal('${g.id}')">
-          <div class="card-img-wrapper">
-            <img src="${g.img}" alt="${g.title}">
-          </div>
-          <div class="card-content">
-            <div class="title">${g.title}</div>
-            <div class="rating-row">
-              <span class="stars-icon">★</span>
-              <span class="rating-score">${g.rating.toFixed(1)}</span>
-              <span class="reviews-count">(${g.reviews})</span>
-            </div>
-            <div class="stats-info">
-              ▶ ${g.plays.toLocaleString()} plays • ⏱️ ${formatTime(g.timeSeconds)}
-            </div>
-            <button class="view-btn">Launch Experience</button>
-          </div>
-        </div>
-      `;
+      render();
     }
 
     function render() {
-      renderMetrics();
-      let filtered = filterGames(searchQuery);
-      const grid = document.getElementById("grid");
+      document.getElementById("total-plays-metric").innerText = "1,072";
+      document.getElementById("total-time-metric").innerText = "24h 15m";
 
-      if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 50px 20px; color: var(--text-muted); background: var(--card-bg); border-radius: 16px; border: 1px dashed var(--border);">
-            <h3>🔍 No direct match found for "${searchQuery}"</h3>
-            <p style="margin-top: 8px; font-size: 0.9rem;">Try searching for <b>strategy</b>, <b>action</b>, <b>space</b>, <b>3d</b>, or <b>puzzle</b>!</p>
-          </div>`;
-      } else {
-        grid.innerHTML = filtered.map(renderCardHTML).join('');
-      }
-
-      renderMoreOptionsSection();
-      initScrollReveal();
+      document.getElementById("grid").innerHTML = games.map(g => `
+        <div class="card">
+          <div class="card-img-wrapper">
+            <img src="${g.img}" alt="${g.title}" />
+          </div>
+          <div class="card-body">
+            <div>
+              <div class="title">${g.title}</div>
+              <div class="plays">${(parseInt(g.plays) || 0).toLocaleString()} plays • ⏱️ ${g.time}</div>
+            </div>
+            <button class="play-btn" onclick="play('${g.id}')">▶ Play</button>
+          </div>
+        </div>
+      `).join('');
     }
 
-    function renderMoreOptionsSection() {
-      const moreGrid = document.getElementById("more-options-grid");
-      const titleEl = document.getElementById("more-options-title");
-
-      let recommendations = [];
-      if (activeGameId) {
-        const activeGame = games.find(x => x.id === activeGameId);
-        titleEl.innerText = `🔥 More Like "${activeGame ? activeGame.title : 'Selected Game'}"`;
-        recommendations = games.filter(g => g.id !== activeGameId).slice(0, 4);
-      } else {
-        titleEl.innerText = `✨ Recommended & Top Choices`;
-        recommendations = games.slice(0, 4);
-      }
-
-      moreGrid.innerHTML = recommendations.map(renderCardHTML).join('');
-    }
-
-    function openModal(id) {
-      const g = games.find(x => x.id === id);
-      if (!g) return;
-
-      document.getElementById("modal-img").src = g.img;
-      document.getElementById("modal-title").innerText = g.title;
-      document.getElementById("modal-rating").innerText = g.rating.toFixed(1);
-      document.getElementById("modal-reviews").innerText = `(${g.reviews} reviews)`;
-      document.getElementById("modal-plays").innerText = g.plays.toLocaleString();
-      document.getElementById("modal-time").innerText = formatTime(g.timeSeconds);
-      document.getElementById("modal-session").innerText = g.session;
-      document.getElementById("modal-desc").innerText = g.desc;
-      
-      const playBtn = document.getElementById("modal-play-btn");
-      playBtn.onclick = () => { closeModal(); play(g.id); };
-
-      document.getElementById("details-modal").style.display = "flex";
-    }
-
-    function closeModal() {
-      document.getElementById("details-modal").style.display = "none";
-    }
-
-    function play(id) {
-      const g = games.find(x => x.id === id);
-      if (!g) return;
-
-      const playerSec = document.getElementById("player-section");
-      const overlay = document.getElementById("dissolve-overlay");
-      const frame = document.getElementById("game-frame");
-      const statusText = document.getElementById("dissolve-status");
-
-      const isPlayerOpen = playerSec.style.display === "block";
-
-      g.plays += 1;
-      activeUrl = g.url;
-      activeGameId = id;
-
-      document.getElementById("player-name").innerText = `Playing: ${g.title}`;
-
-      if (isPlayerOpen) {
-        statusText.innerText = `Loading ${g.title}...`;
-        overlay.classList.add("active");
-
-        setTimeout(() => {
-          frame.src = g.url;
-          playerSec.scrollIntoView({ behavior: 'smooth' });
-          setTimeout(() => {
-            overlay.classList.remove("active");
-          }, 600);
-        }, 400);
-
-      } else {
-        frame.src = g.url;
-        playerSec.style.display = "block";
-        playerSec.scrollIntoView({ behavior: 'smooth' });
-      }
-
-      clearInterval(playTimer);
-      playTimer = setInterval(() => {
-        if (activeGameId) {
-          const current = games.find(x => x.id === activeGameId);
-          if (current) {
-            current.timeSeconds += 1;
-            save();
-          }
+    async function ensureCameraPermission() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          stream.getTracks().forEach(track => track.stop());
+        } catch (err) {
+          console.warn("Camera access denied or prompt bypassed:", err);
         }
-      }, 1000);
+      }
+    }
 
+    async function play(id) {
+      const g = games.find(x => x.id === id);
+      if (!g) return;
+
+      if (id === 'game_hand_gesture_slicer' || g.title.toLowerCase().includes('gesture')) {
+        await ensureCameraPermission();
+      }
+
+      g.plays = (parseInt(g.plays) || 0) + 1;
+      activeUrl = g.url;
+      document.getElementById("player-name").innerText = `Playing: ${g.title}`;
+      document.getElementById("game-frame").src = g.url;
+      document.getElementById("player-section").style.display = "block";
+      document.getElementById("player-section").scrollIntoView({ behavior: 'smooth' });
       save();
-      renderMoreOptionsSection();
     }
 
     function closePlayer() {
-      clearInterval(playTimer);
-      activeGameId = null;
       document.getElementById("player-section").style.display = "none";
       document.getElementById("game-frame").src = "";
-      renderMoreOptionsSection();
     }
 
     function openTab() {
       if (activeUrl) window.open(activeUrl, "_blank");
     }
 
-    const services = ["Interactive 3D Web Games...", "Custom Web Applications...", "AI Image & Content Generation..."];
-    let serviceIndex = 0, charIndex = 0, isDeleting = false;
-    function typeEffect() {
-      const current = services[serviceIndex];
-      const el = document.getElementById("typewriter-text");
-      if (isDeleting) { el.textContent = current.substring(0, charIndex-- - 1); }
-      else { el.textContent = current.substring(0, charIndex++ + 1); }
-      let speed = isDeleting ? 40 : 80;
-      if (!isDeleting && charIndex === current.length) { speed = 2000; isDeleting = true; }
-      else if (isDeleting && charIndex === 0) { isDeleting = false; serviceIndex = (serviceIndex + 1) % services.length; speed = 500; }
-      setTimeout(typeEffect, speed);
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      initIntroGallery();
-      typeEffect();
-      render();
-    });
+    initHeroCarousel();
+    render();
   </script>
 </body>
 </html>
